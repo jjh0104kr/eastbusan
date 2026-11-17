@@ -872,3 +872,21 @@ a.gy-v:hover .pl{background:var(--ink)}a.gy-v:hover strong{text-decoration:under
 }
 @media(max-width:760px){.hq{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 16px 0}.hq a{justify-content:center;padding:12px 8px;font-size:14px}.hq a svg{display:none}}
 @media(max-width:760px){.ubar{display:none}}
+
+/* 애니메이션 끄기 버튼 */
+.fx-btn{position:absolute;z-index:6;top:14px;right:max(16px,calc((100% - 1180px)/2));display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.9);background:rgba(255,253,247,.85);backdrop-filter:blur(6px);font:inherit;font-size:13px;font-weight:700;color:#3b2616;cursor:pointer;box-shadow:0 4px 14px rgba(80,50,10,.12)}
+.fx-btn i{width:8px;height:8px;border-radius:50%;background:#7bb36a}
+.fx-btn[aria-pressed="true"] i{background:#b9b2a3}
+.hero.compact .fx-btn{display:none}
+body.no-anim *,body.no-anim *::before,body.no-anim *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+body.no-anim .zoom,body.no-anim .glow,body.no-anim .beam{animation:none!important}
+/* 모바일: 배경 확대·축소 멈춤, 책 크기 포스터에 맞춤 */
+@media(max-width:760px){
+  .zoom{animation:none;scale:1.04}
+  .shelf{grid-template-columns:minmax(0,280px);justify-content:center;gap:26px}
+  .fx-btn{top:10px;right:12px;padding:6px 12px;font-size:12.5px}
+}
+
+.fx-btn{top:10px;padding:4px 10px;gap:5px;font-size:11.5px;font-weight:600;box-shadow:0 2px 8px rgba(80,50,10,.1);background:rgba(255,253,247,.7)}
+.fx-btn i{width:6px;height:6px}
+@media(max-width:760px){.fx-btn{top:8px;right:10px;padding:3px 9px;font-size:11px}}

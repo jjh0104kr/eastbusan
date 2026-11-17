@@ -271,6 +271,7 @@ function renderHome(){
   const cols = latest.length ? `<div class="pgrid home-pg rv">${latest.map((m, i) => posterHTML(m, i)).join('')}</div>` : '<p class="bempty">아직 올라온 자료가 없어요.</p>';
   view.innerHTML = `
   <section class="hero" id="hero">
+    <button class="fx-btn" id="fxbtn" type="button" aria-pressed="false"></button>
     <div class="hbg">
       <div class="stage"><div class="zoom">
         <img class="heroimg" src="images/hero.jpg" alt="" fetchpriority="high">
@@ -306,6 +307,8 @@ function renderHome(){
   </div>`;
   homeUnitOptions(); homeList(true);
   setNavH(); heroFx();
+  const fxb = $('#fxbtn'), fxs = () => { const off = document.body.classList.contains('no-anim'); fxb.setAttribute('aria-pressed', off); fxb.innerHTML = off ? '<i></i>효과 켜기' : '<i></i>효과 끄기'; };
+  fxs(); fxb.addEventListener('click', () => { const off = document.body.classList.toggle('no-anim'); try { localStorage.setItem('noanim', off ? '1' : ''); } catch (e) {} fxs(); });
   $('#hint').addEventListener('click', () => $('#board-sec').scrollIntoView({ behavior:'smooth', block:'start' }));
   const qi = $('#q'), clr = $('#clr'), fb = $('#fbtn'), fp = $('#fpanel');
   const sync = () => { clr.hidden = !qi.value; fb.classList.toggle('dot', hs.subj !== 'all' || hs.type !== 'all' || hs.unit !== 'all'); };
@@ -548,3 +551,5 @@ async function init(){
   requestAnimationFrame(() => setTimeout(hideLoader, 150));
 }
 init();
+
+try { if (localStorage.getItem('noanim')) document.body.classList.add('no-anim'); } catch (e) {}
