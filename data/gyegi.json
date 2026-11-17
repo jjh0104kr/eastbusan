@@ -1,0 +1,488 @@
+{
+ "jeju43": {
+  "title": "제주 4.3 사건",
+  "topics": [
+   "제주4.3사건을 우리가 기억해야 하는 이유?",
+   "정부에서 4.3사건을 인정하고 사과한 시기는? 왜 이렇게 오래 걸렸을까?",
+   "4·3사건을 기리는 사람들은 어떤 방식으로 ‘기억’하려 노력할까?",
+   "내 주변 사람들은 4.3사건을 어떻게, 얼마나 알고 있을까?"
+  ],
+  "extra": [],
+  "sections": [
+   {
+    "id": "place",
+    "title": "함께 볼 곳",
+    "kind": "sites",
+    "items": [
+     {
+      "title": "제주4.3평화재단",
+      "meta": "공식 사이트",
+      "url": "https://jeju43peace.or.kr/"
+     },
+     {
+      "title": "4.3평화공원과 4.3평화기념관",
+      "meta": "답사 장소",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "id": "film",
+    "title": "영화",
+    "kind": "films",
+    "items": [
+     {
+      "title": "지슬 - 끝나지 않은 세월2",
+      "meta": "108분",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "",
+        "url": "https://youtu.be/vk6RRhYgt2Y"
+       },
+       {
+        "title": "뉴스",
+        "meta": "",
+        "url": "https://youtu.be/0QY_y4FBipA"
+       }
+      ]
+     },
+     {
+      "title": "4월의 동백",
+      "meta": "대정고 자율동아리 4.3 단편영화 · 28분 37초",
+      "clips": [
+       {
+        "title": "본편",
+        "meta": "28분 37초",
+        "url": "https://youtu.be/rjyjur8AFfQ"
+       }
+      ]
+     },
+     {
+      "title": "돌들이 말할 때까지",
+      "meta": "100분",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "",
+        "url": "https://youtu.be/dNK0uGH88_A"
+       }
+      ]
+     },
+     {
+      "title": "4.3항쟁 기념관 애니메이션",
+      "meta": "4분 5초",
+      "clips": [
+       {
+        "title": "애니메이션",
+        "meta": "4분 5초",
+        "url": "https://youtu.be/kdzmh-b_6vk"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "news",
+    "title": "뉴스 · 예능",
+    "kind": "videos",
+    "items": [
+     {
+      "title": "꼬꼬무",
+      "meta": "20분 50초",
+      "url": "https://youtu.be/pR7ftzcBMuE"
+     },
+     {
+      "title": "제주4.3 5분 요약정리",
+      "meta": "5분",
+      "url": "https://youtu.be/M0oetkBf_Fc"
+     },
+     {
+      "title": "알쓸범잡",
+      "meta": "19분 47초",
+      "url": "https://youtu.be/Wl6XSv_3i6U"
+     },
+     {
+      "title": "제주할머니가 생선을 못드시는 이유",
+      "meta": "5분 53초",
+      "url": ""
+     },
+     {
+      "title": "지식채널E 제주4.3이 뭐우깡",
+      "meta": "5분 23초",
+      "url": "https://youtu.be/7jcVD3MkljI"
+     },
+     {
+      "title": "4.3사건에 대한 노무현 정권의 공식 사과",
+      "meta": "10분 19초",
+      "url": "https://youtu.be/dc3UDT4U4QQ"
+     },
+     {
+      "title": "제주 4.3 사건 피해자 양농옥 할머니가 밝히는 그날의 진실",
+      "meta": "비디오머그 · 4분 58초",
+      "url": "https://youtu.be/Fnhh4SLMoD4"
+     },
+     {
+      "title": "4.3에 대해 잘 아는 사람은 이제 다 죽고 없단다",
+      "meta": "씨리얼 사회탐구 · 7분 55초",
+      "url": "https://youtu.be/6S8hjrvQZzc"
+     },
+     {
+      "title": "4월에 제주도에 꼭 가야하는 이유",
+      "meta": "빠다너스 · 10분 42초",
+      "url": "https://youtu.be/VH-RY8FO-Ug"
+     },
+     {
+      "title": "제주4.3을 우리가 모를 수 밖에 없는 이유",
+      "meta": "씨리얼 사회탐구 · 4분 26초",
+      "url": "https://youtu.be/EsWr-vDs5rw"
+     },
+     {
+      "title": "‘총살거부’ 4.3경찰 영웅 문형순 ‘국가유공자’ 인정",
+      "meta": "2분 25초",
+      "url": "https://youtu.be/5KLZ2YHUw-Y"
+     },
+     {
+      "title": "부당하므로 불이행 - 문형순 경찰서장 이야기",
+      "meta": "6분 26초",
+      "url": "https://youtu.be/QhMPbqZQEcM"
+     }
+    ]
+   },
+   {
+    "id": "novel",
+    "title": "소설",
+    "kind": "books",
+    "items": [
+     {
+      "title": "순이삼촌",
+      "meta": "현기영"
+     },
+     {
+      "title": "작별하지 않는다",
+      "meta": "한강"
+     }
+    ]
+   },
+   {
+    "id": "pbook",
+    "title": "그림책",
+    "kind": "books",
+    "items": [
+     {
+      "title": "빗창",
+      "meta": "김홍모 · 민주화운동기념사업회"
+     },
+     {
+      "title": "나무도장",
+      "meta": "권윤덕"
+     }
+    ]
+   },
+   {
+    "id": "song",
+    "title": "노래",
+    "kind": "songs",
+    "items": [
+     {
+      "title": "4월 동백",
+      "meta": "안치환",
+      "url": "https://youtu.be/W4aasg8zw8M"
+     },
+     {
+      "title": "4월의 춤",
+      "meta": "루시드폴",
+      "url": "https://youtu.be/OminAcKjXp4"
+     },
+     {
+      "title": "음악으로 듣는 4.3",
+      "meta": "음악 다큐멘터리 · 48분 49초",
+      "url": "https://youtu.be/avqPWV6Gal4"
+     }
+    ]
+   }
+  ]
+ },
+ "korean-war": {
+  "title": "6.25 전쟁",
+  "topics": [
+   "6·25전쟁은 언제, 어떻게 시작되었을까?",
+   "미국과 소련, 중국은 왜 전쟁에 개입했을까?",
+   "6·25전쟁으로 인해 어떤 피해가 발생했을까?",
+   "6·25전쟁을 다룬 영화나 문학 작품에는 어떤 메시지가 담겨 있을까?",
+   "학살 피해자들은 어떤 이유로 희생되었을까? 전쟁 중 명령과 복종, 책임의 문제는 어떻게 봐야 할까?",
+   "국가가 과거의 민간인 학살을 조사하고 사과하는 이유는 무엇일까?"
+  ],
+  "extra": [
+   "피란수도 부산",
+   "6.25전쟁 중 민간인 학살 사건"
+  ],
+  "sections": [
+   {
+    "id": "place",
+    "title": "함께 볼 곳",
+    "kind": "sites",
+    "items": [
+     {
+      "title": "노근리 사건",
+      "meta": "yd21.go.kr",
+      "url": "https://www.yd21.go.kr/nogunri/"
+     },
+     {
+      "title": "보도연맹 사건",
+      "meta": "jinsil.go.kr",
+      "url": "https://jinsil.go.kr/KoreanWar/32.do"
+     },
+     {
+      "title": "국가기록원 - 6.25전쟁",
+      "meta": "theme.archives.go.kr",
+      "url": "https://theme.archives.go.kr/next/625/viewMain.do"
+     }
+    ]
+   },
+   {
+    "id": "film",
+    "title": "영화",
+    "kind": "films",
+    "items": [
+     {
+      "title": "태극기 휘날리며",
+      "meta": "2004년 · 한국",
+      "clips": [
+       {
+        "title": "방구석 1열 ‘태극기휘날리며’ ‘아일라’",
+        "meta": "52분 12초",
+        "url": "https://youtu.be/jcvWIC6PNfg"
+       },
+       {
+        "title": "보도연맹 학살사건 관련 장면",
+        "meta": "8분 41초",
+        "url": "https://youtu.be/3IJFTIiIx0I"
+       }
+      ]
+     },
+     {
+      "title": "웰컴 투 동막골",
+      "meta": "2005년 · 한국",
+      "clips": [
+       {
+        "title": "방구석 1열 ‘웰컴투동막골’",
+        "meta": "18분 19초",
+        "url": "https://youtu.be/-gX2sBwoBmI"
+       },
+       {
+        "title": "출발 비디오여행 ‘웰컴투동막골’",
+        "meta": "10분 43초",
+        "url": "https://youtu.be/C2gGpgkB4No"
+       }
+      ]
+     },
+     {
+      "title": "포화속으로",
+      "meta": "2010년 · 한국",
+      "note": "학도병 이야기",
+      "clips": [
+       {
+        "title": "포화속으로 실제 역사, 포항여중 학도병 이야기",
+        "meta": "14분 50초",
+        "url": "https://youtu.be/gsSpi_NpSR0"
+       }
+      ]
+     },
+     {
+      "title": "고지전",
+      "meta": "2011년 · 한국",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "1분 21초",
+        "url": "https://youtu.be/2GQtxv5ou20"
+       }
+      ]
+     },
+     {
+      "title": "인천상륙작전",
+      "meta": "2016년 · 한국",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "1분 40초",
+        "url": "https://youtu.be/cjtjiKa9uO4"
+       },
+       {
+        "title": "꼬꼬무 인천상륙작전",
+        "meta": "14분 57초",
+        "url": "https://youtu.be/SeIY4W2_5WE"
+       }
+      ]
+     },
+     {
+      "title": "아일라",
+      "meta": "2017년 · 튀르키예",
+      "note": "한국전쟁 참전국 터키 병사와 한국 여자 아이의 인간적인 만남",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "1분 17초",
+        "url": "https://youtu.be/AmhVpYMkcL4"
+       }
+      ]
+     },
+     {
+      "title": "스윙키즈",
+      "meta": "2018년 · 한국",
+      "note": "1951년 거제도 포로수용소, 오직 춤에 대한 열정으로 뭉친 오합지졸 댄스단 ‘스윙키즈’의 가슴 터질 듯한 이야기를 그린 영화",
+      "clips": [
+       {
+        "title": "예고편",
+        "meta": "2분 5초",
+        "url": "https://youtu.be/LirNDef5Dus"
+       },
+       {
+        "title": "방구석1열 ‘스윙키즈’",
+        "meta": "13분 48초",
+        "url": "https://youtu.be/TAA1lras7NU"
+       }
+      ]
+     },
+     {
+      "title": "내 어머니 이야기",
+      "meta": "12분 21초",
+      "note": "피란온 어머니 이야기 애니메이션",
+      "clips": [
+       {
+        "title": "애니메이션",
+        "meta": "12분 21초",
+        "url": "https://youtu.be/Rly4ts82h-o"
+       }
+      ]
+     },
+     {
+      "title": "국제시장",
+      "meta": "",
+      "clips": [
+       {
+        "title": "흥남부두철수작전 장면",
+        "meta": "",
+        "url": "https://youtu.be/H0prjCjrOlY"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "video",
+    "title": "예능 · 다큐",
+    "kind": "videos",
+    "items": [
+     {
+      "title": "문쌤 실감나는 6.25전쟁 6분요약",
+      "meta": "6분",
+      "url": "https://youtu.be/VmFFlK03WHc"
+     },
+     {
+      "title": "[꼬꼬무 150회 요약] 한 번 가면 돌아오지 못하는 죽음의 골짜기 | 꼬리에 꼬리를 무는 그날 이야기",
+      "meta": "21분 28초",
+      "url": "https://youtu.be/nsWHJiNyg5A"
+     },
+     {
+      "title": "한국전쟁 유적 1부 피란수도 부산",
+      "meta": "한국전쟁 70주년",
+      "url": "https://youtu.be/6kWCptCOUdE"
+     },
+     {
+      "title": "한국전쟁의 상흔이 가장 많이 남아있는.. 대한민국 유일한 도시",
+      "meta": "놀러와부산이야 · 2023.6.23",
+      "url": "https://youtu.be/q6J124cATzc"
+     },
+     {
+      "title": "꼬꼬무 흥남부두 철수작전",
+      "meta": "20분 56초",
+      "url": "https://youtu.be/c0YeXUZLuX0"
+     },
+     {
+      "title": "크리스마스의 기적 흥남철수작전",
+      "meta": "5분 56초",
+      "url": "https://youtu.be/oBWZ65pvR-w"
+     },
+     {
+      "title": "[창+] 스무살 새색시가 기다려온 84세 남편...그 짧은 만남",
+      "meta": "KBS · 2023.2.21 · 7분",
+      "url": "https://youtu.be/qM5KyGLTq_s"
+     }
+    ]
+   },
+   {
+    "id": "book",
+    "title": "책",
+    "kind": "books",
+    "items": [
+     {
+      "title": "그 많던 싱아는 누가 다 먹었을까",
+      "meta": "박완서",
+      "tag": "소설",
+      "excerpt": [
+       "한국전쟁 시기, 인민군이 3개월 동안 낙동강 이북 지역까지 점령했다가, 이후 국군이 서울을 되찾으며 전세가 역전되게 된다. 이 과정에서 인민군에게 협조했다고 분류된 이들은 국군, 경찰, 민간인 자경대에 의해 '빨갱이'로 불리며, 갇히거나 죽임을 당하게 된다.",
+       "강화와 교동은 남과 북이 서로 치열하게 싸우며 차지할 만한 전략지가 아니었다. 이에 전선이 오르락 내리락 했을 때도 미군, 국군, 인민군 중 아무도 이 섬에 들어오지 않았다. 그러나, 전선의 변화 과정에서 생긴 부역 혐의에 대한 보복 행위는 다른 양상으로 전개된다. 강화와 교동은 강화 향토 방위대라는 자경단에 의해, 민간인 학살이 진행된다. 강화향토방위대는 교동 바다 건너편에 있던 연백에서 피난 온 이들로 구성되었다. 이들은 이후 을지타이거여단으로 불리며 부역 행위를 하거나 북으로 건너간 이들의 남은 가족들을 찾아 학살을 자행한다. 교동 주민들의 증언에 따르면 소위 '손가락총'이라 불리는, 누군가의 지목을 받게 되면 학살이 대상이 되고 말았다.",
+       "…. 그러나 애국은 곧 반공이었다. 애국과 반공은 손바닥의 앞뒤처럼 따로 성립될 수 없는 것으로 되어 있었다. 애국하고 싶은 마음들이 급해 많은 단체들이 생겨났고 무슨 무슨 청년단이니 자위대니 하는 애국단체가 하는 일도 주로 빨갱이 족치기였다. 정부와 경찰, 군인, 헌병 등 치안을 유지할 수 있는 기관이 다 환도했지만 그들의 주업무도 공산분자를 색출하는 일이었다. 계엄령 하였다. 적 치하에서 부역한 빨갱이들을 유치장에서 메어지게 잡아들이고 즉결처분도 성행했다. 빨갱이 목숨이 사람 목숨과 같을 수 없었다. 저기 빨갱이가 간다는 뒷손가락질 한 번으로 그 자리에서 총을 맞고 즉사한 사례도 있었다."
+      ]
+     },
+     {
+      "title": "몽실 언니",
+      "meta": "권정생",
+      "tag": "소설"
+     },
+     {
+      "title": "수난이대",
+      "meta": "하근찬",
+      "tag": "소설"
+     },
+     {
+      "title": "태백산맥",
+      "meta": "조정래",
+      "tag": "소설"
+     },
+     {
+      "title": "엄마에게",
+      "meta": "",
+      "tag": "그림책"
+     }
+    ]
+   },
+   {
+    "id": "song",
+    "title": "노래",
+    "kind": "songs",
+    "items": [
+     {
+      "title": "굳세어라 금순아",
+      "meta": "현인",
+      "url": "https://youtu.be/KQazL-qi2_Y"
+     },
+     {
+      "title": "라구요",
+      "meta": "강산에 · 실향민의 아픔을 담은 노래",
+      "url": "https://youtu.be/aJFfDhY3Fp8"
+     },
+     {
+      "title": "잃어버린 30년",
+      "meta": "설운도",
+      "url": "https://youtu.be/pvETRTM9BR0"
+     }
+    ]
+   },
+   {
+    "id": "art",
+    "title": "미술작품",
+    "kind": "books",
+    "items": [
+     {
+      "title": "한국에서의 학살",
+      "meta": "파블로 피카소",
+      "tag": "미술"
+     }
+    ]
+   }
+  ]
+ }
+}
