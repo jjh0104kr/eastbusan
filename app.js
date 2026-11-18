@@ -18,7 +18,9 @@ const udec = c => c === 'x' ? '기타' : c;
 const unitTitle = (s, c) => { const u = UNITS[s].find(x => x[0] === c); return !u ? '' : (c === '기타' ? '단원 외 자료' : u[1]); };
 const unitLabel = c => c === '기타' ? '단원 외' : c + '단원';
 const byNew = (a, b) => b.date.localeCompare(a.date);
-const countOf = (s, c) => DB.materials.filter(m => m.subject === s && (c == null || m.unit === c)).length;
+const inSubj = (m, s) => m.subject === s || (m.also || []).includes(s);
+const subjOf = m => [m.subject, ...(m.also || [])].map(k => SUBJ[k]).join('·');
+const countOf = (s, c) => DB.materials.filter(m => inSubj(m, s) && (c == null || m.unit === c)).length;
 if (matchMedia('(hover:none)').matches) document.documentElement.classList.add('touch');
 
 const artKey = m => m.subject === 'etc' ? 'etc-x' : m.subject === 'books' ? 'tile-books' : `${m.subject}-${ucode(m.unit)}`;
@@ -31,7 +33,7 @@ const pic = k => art(k) + unitImg(k);
 
 /* ---------- 자료 한 줄 ---------- */
 function rowHTML(m, i, meta){
-  const top = meta ?? [SUBJ[m.subject], m.subject === 'etc' ? '' : unitLabel(m.unit)].filter(Boolean).join(' · ');
+  const top = meta ?? [subjOf(m), m.subject === 'etc' ? '' : unitLabel(m.unit)].filter(Boolean).join(' · ');
   const tags = (m.tags || []).length ? `<span class="tags">${m.tags.map(t => `<i>#${esc(t)}</i>`).join('')}</span>` : '';
   const sub = [m.author, fmt(esc(m.date))].filter(Boolean).join(' · ');
   const go = m.link ? `<a class="r-btn" href="${esc(m.link)}" target="_blank" rel="noopener">자료 보기<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>` : `<span class="r-go" aria-hidden="true">→</span>`;
@@ -50,7 +52,7 @@ function posterImg(m){
 const FMT = { '시뮬레이션':'f1', '보드게임':'f2', '복습 퀴즈':'f3' };
 const pills = m => `<span class="pills"><span class="kind k${TYPES.indexOf(m.type) + 1}">${esc(m.type)}</span>${m.format ? `<span class="kind fmt ${FMT[m.format] || 'f1'}">${esc(m.format)}</span>` : ''}</span>`;
 function posterHTML(m, i, meta){
-  const top = [meta ?? [SUBJ[m.subject], m.subject === 'etc' ? (m.group || '') : unitLabel(m.unit)].filter(Boolean).join(' · '), m.topic].filter(Boolean).join(' · ');
+  const top = [meta ?? [subjOf(m), m.subject === 'etc' ? (m.group || '') : unitLabel(m.unit)].filter(Boolean).join(' · '), m.topic].filter(Boolean).join(' · ');
   return `<a class="pst" style="--i:${Math.min(i, 14)}" href="#material-${m.id}"><span class="pst-img">${posterImg(m)}${m.author ? `<em class="by">${esc(m.author)}</em>` : ''}</span>${pills(m)}<strong>${esc(m.title)}</strong><small>${esc(top)}</small></a>`;
 }
 function renderMaterial(m){
@@ -67,14 +69,14 @@ function renderMaterial(m){
     (m.how || []).length ? card('진행 방식', `<ol>${m.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`, 'wide') : '',
     (m.learn || []).length ? card('다루는 내용', `<ul>${m.learn.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : '',
     (m.play || []).length ? card('플레이 정보', dl(m.play)) : '',
-    card('자료 정보', dl([['과목', SUBJ[m.subject]], ['단원', m.subject === 'etc' ? '' : `${unitLabel(m.unit)}${un ? ' · ' + esc(un) : ''}`], ['다룬 내용', esc(m.topic || '')], ['유형', esc(m.type)], ['형식', esc(m.format || '')], ['만든 사람', esc(m.author || '')], ['등록일', fmt(esc(m.date))]])),
+    card('자료 정보', dl([['과목', subjOf(m)], ['단원', m.subject === 'etc' ? '' : `${unitLabel(m.unit)}${un ? ' · ' + esc(un) : ''}`], ['다룬 내용', esc(m.topic || '')], ['유형', esc(m.type)], ['형식', esc(m.format || '')], ['만든 사람', esc(m.author || '')], ['등록일', fmt(esc(m.date))]])),
     (m.tags || []).length ? card('키워드', `<div class="tags big">${m.tags.map(t => `<i>#${esc(t)}</i>`).join('')}</div>`, 'wide') : ''
   ].join('');
   view.innerHTML = `
   <div class="wrap s-${m.subject}"><div class="mdetail">
     <div class="m-poster">${posterImg(m)}${m.author ? `<em class="by">${esc(m.author)}</em>` : ''}</div>
     <div class="m-main">
-      <div class="crumb" style="color:var(--sub)">${home} › <a href="#${m.subject}">${SUBJ[m.subject]}</a>${unitLink}</div>
+      <div class="crumb" style="color:var(--sub)">${home} › ${m.also ? [m.subject, ...m.also].map(k => `<a href="#${k}">${SUBJ[k]}</a>`).join(' · ') : `<a href="#${m.subject}">${SUBJ[m.subject]}</a>${unitLink}`}</div>
       ${pills(m)}
       <h1>${esc(m.title)}</h1>
       <p class="m-lead">${esc(m.overview || m.desc)}</p>
@@ -209,18 +211,23 @@ function homeActive(){ return !!hs.q.trim(); }
 function homeList(animate){
   const norm = t => String(t).toLowerCase().replace(/[\s.·,\-_]/g, ''), q = norm(hs.q);
   const items = DB.materials.filter(m =>
-    (hs.subj === 'all' || m.subject === hs.subj) && (hs.type === 'all' || m.type === hs.type) && (hs.unit === 'all' || m.unit === hs.unit) &&
-    (!q || norm([m.title, m.desc, m.author, (m.tags || []).join(' '), m.format || '', m.topic || '', SUBJ[m.subject], unitName(m)].join(' ')).includes(q))
+    (hs.subj === 'all' || inSubj(m, hs.subj)) && (hs.type === 'all' || m.type === hs.type) && (hs.unit === 'all' || m.unit === hs.unit) &&
+    (!q || norm([m.title, m.desc, m.author, (m.tags || []).join(' '), m.format || '', m.topic || '', subjOf(m), unitName(m)].join(' ')).includes(q))
   ).sort(byNew);
   const active = homeActive();
   const hero = $('#hero'); if (hero) hero.classList.toggle('compact', !!active);
   $('#res-sec').hidden = !active;
   $('#board-sec').hidden = !!active;
-  $('#res-count').textContent = `${items.length}개`;
+  const fw = active && hs.type === 'all' && hs.unit === 'all' ? wsFind(t => norm(t).includes(q), hs.subj) : { ws: [], cmp: [] };
+  const wsn = fw.ws.length + fw.cmp.length;
+  $('#res-count').textContent = `${items.length + wsn}개`;
+  $('#home-ws').innerHTML = wsn ? (fw.cmp.length ? `<h3>단원별 비교<i>${fw.cmp.length}</i></h3><div class="hws-g">${fw.cmp.slice(0, 12).map(({ e, href }) => `<a class="hws-r" href="${href}"><b>${esc(e.u.t)}</b><small>${e.tn}명의 학습지를 나란히 보기</small></a>`).join('')}</div>` : '')
+    + (fw.ws.length ? `<h3>학습지<i>${fw.ws.length}</i></h3><div class="hws-g">${fw.ws.slice(0, 18).map(({ w, c, href, p, sn }) => `<a class="hws-r" href="${href}" data-w="${w.id}" data-p="${p}"><b>${esc(c.n)} · ${esc(c.title)}</b><small>${esc(w.teacher)} · ${esc(w.term)} · ${p}쪽</small>${sn ? `<em>${esc(sn)}</em>` : ''}</a>`).join('')}</div>` : '') : '';
+  const mh = $('#home-mh'); mh.hidden = !items.length; mh.innerHTML = `수업·평가 자료<i>${items.length}</i>`;
   const list = $('#home-list');
   list.classList.toggle('still', !animate);
   list.className = items.length ? 'pgrid' : 'list';
-  list.innerHTML = items.length ? items.map((m, i) => posterHTML(m, i)).join('') : `<div class="empty">${MS}조건에 맞는 자료가 없어요. 검색어나 필터를 바꿔 보세요.</div>`;
+  list.innerHTML = items.length ? items.map((m, i) => posterHTML(m, i)).join('') : wsn ? '' : `<div class="empty">${MS}조건에 맞는 자료가 없어요. 검색어나 필터를 바꿔 보세요.</div>`;
 }
 function homeUnitOptions(){
   const sel = $('#unit-sel');
@@ -230,7 +237,7 @@ function homeUnitOptions(){
   sel.value = hs.unit;
 }
 function bitem(m){
-  const meta = [SUBJ[m.subject], m.subject === 'etc' ? '' : unitLabel(m.unit)].filter(Boolean).join(' · ');
+  const meta = [subjOf(m), m.subject === 'etc' ? '' : unitLabel(m.unit)].filter(Boolean).join(' · ');
   return `<a class="bitem${m.thumb ? ' th' : ''}" href="#material-${m.id}">${m.thumb ? `<span class="bi-th"><img src="${esc(m.thumb)}" alt="" draggable="false" loading="lazy"></span>` : ''}<span class="bi-t"><strong>${esc(m.title)}</strong><small>${esc(meta)}</small></span></a>`;
 }
 const SPARKS = [[58.6,86.5,30,2.6],[56,90,18,3.4],[61.5,53.5,22,3],[65,59,28,2.2],[57.5,57,16,3.8],[67,63,20,2.9],[20.5,60,22,3.3]];
@@ -303,9 +310,10 @@ function renderHome(){
     <section class="sec" id="board-sec"><span id="latest"></span><div class="sec-h rv"><h2>최신 모임 자료</h2><span>바이브 코딩</span></div>
       ${cols}
     </section>
-    <section class="sec" id="res-sec" hidden><div class="sec-h"><h2>검색 결과</h2><span id="res-count"></span></div><div class="list" id="home-list"></div></section>
+    <section class="sec" id="res-sec" hidden><div class="sec-h"><h2>검색 결과</h2><span id="res-count"></span></div><div class="hws" id="home-ws"></div><h3 class="hws-hd" id="home-mh" hidden></h3><div class="list" id="home-list"></div></section>
   </div>`;
   homeUnitOptions(); homeList(true);
+  $('#home-ws').addEventListener('click', e => { const a = e.target.closest('[data-w]'); if (a) { try { sessionStorage.setItem('wj', JSON.stringify({ id: a.dataset.w, p: +a.dataset.p })); } catch (x) {} } });
   setNavH(); heroFx();
   { const hh = () => { const h = $('#hero'); if (h) h.style.setProperty('--hh', Math.max(540, innerHeight - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 61)) + 'px'); };
     hh(); addEventListener('orientationchange', () => setTimeout(hh, 300)); if (innerWidth > 1100) addEventListener('resize', hh); }
@@ -348,20 +356,158 @@ function renderGyegi(sub){
   view.innerHTML = band({ cls:'s-etc', crumb:`<a href="#home">홈</a> › <a href="#etc">기타자료</a> › 계기 교육`, title:'계기 교육', desc:'', img: bandImg('images/sections/etc.webp') }) + `<div class="wrap s-etc gy">${ub}${tabs}${body}</div>`;
   $('#gy-nav').addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); const t = $('#' + a.dataset.t); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) - 18, behavior:'smooth' }); });
 }
+
+/* ===== 교과 수업 학습지 아카이브 (토글 → 선생님 탭 → 학습지 페이지) ===== */
+const TEACHERS = [['jaehoon', '노재훈T'], ['yeseul', '오예슬T'], ['hyunji', '주현지T']];
+const wsSets = (subj, slug) => (DB.worksheets || []).filter(w => w.subject === subj && (!slug || w.slug === slug));
+function wsHTML(subj){
+  let open = false; try { open = localStorage.getItem('wsopen') === '1'; } catch (e) {}
+  const n = wsSets(subj).length;
+  return `<section class="ws${open ? ' open' : ''}" id="ws"><button type="button" class="ws-t" id="ws-t" aria-expanded="${open}"><span><b>교과 수업 학습지 아카이브</b><small>${n ? `${n}개 학습지 묶음` : '준비 중'}</small></span><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="ws-w"><div class="ws-in"><div class="ws-tabs">${TEACHERS.map(([k, t]) => { const c = wsSets(subj, k).length; return c ? `<a href="#${subj}-ws-${k}">${esc(t)}<i>${c}</i></a>` : `<span class="off">${esc(t)}<i>준비 중</i></span>`; }).join('')}${wsCmpOk(subj) ? `<a class="cmpb" href="#${subj}-ws-compare">단원별 비교</a>` : ''}</div></div></div></section>`;
+}
+const wsUnitList = subj => (DB.wsUnits && DB.wsUnits[subj]) || [];
+function wsUnitRows(subj){
+  const m = new Map(wsUnitList(subj).map(u => [u.id, { u, rows: [] }]));
+  wsSets(subj).forEach(w => w.chapters.forEach((c, i) => { const e = c.u && m.get(c.u); if (e) e.rows.push({ w, c, from: c.from, to: w.chapters[i + 1] ? w.chapters[i + 1].from - 1 : w.pages }); }));
+  m.forEach(e => { e.tn = new Set(e.rows.map(r => r.w.slug)).size; });
+  return m;
+}
+const nsp = t => String(t).toLowerCase().replace(/[\s.·,\-_:;()\[\]「」『』“”‘’'"?!~]/g, '');
+function wsFind(test, subj){
+  const ws = [], cmp = [], UM = {};
+  Object.keys(DB.wsUnits || {}).forEach(sj => DB.wsUnits[sj].forEach(u => { UM[u.id] = u; }));
+  (DB.worksheets || []).forEach(w => { if (subj && subj !== 'all' && w.subject !== subj) return;
+    const sets = wsSets(w.subject, w.slug), si = sets.indexOf(w), href = `#${w.subject}-ws-${w.slug}${sets.length > 1 ? '-' + (si + 1) : ''}`;
+    w.chapters.forEach(c => {
+      const u = c.u && UM[c.u], ti = test(c.n + ' ' + c.title), meta = test([w.teacher, w.term, w.title, w.sub || '', c.n, c.title].join(' '));
+      const hit = u ? (u.k || []).filter(k => test(k)) : [], kw = !hit.length && u && (u.k || []).length ? test((u.k || []).join(' ')) : false;
+      if (meta || hit.length || kw) ws.push({ w, c, href, p: c.from, rank: ti ? 0 : meta ? 1 : 2, sn: ti || meta ? '' : hit.length ? hit.slice(0, 4).join(' · ') : '' });
+    }); });
+  ws.sort((a, b) => a.rank - b.rank);
+  (!subj || subj === 'all' ? Object.keys(DB.wsUnits || {}) : [subj]).forEach(sj => wsUnitRows(sj).forEach(e => { if (e.rows.length && e.tn > 1 && test(e.u.t + ' ' + e.u.g + ' 단원별 비교 ' + (e.u.k || []).join(' '))) cmp.push({ e, sj, href: `#${sj}-ws-compare-${e.u.id}` }); }));
+  return { ws, cmp };
+}
+const wsCmpOk = subj => { let ok = false; wsUnitRows(subj).forEach(e => { if (e.tn > 1) ok = true; }); return ok; };
+function initWs(){
+  const b = $('#ws-t'); if (!b) return;
+  b.addEventListener('click', () => { const s = $('#ws'), o = !s.classList.contains('open'); s.classList.toggle('open', o); b.setAttribute('aria-expanded', String(o)); try { localStorage.setItem('wsopen', o ? '1' : '0'); } catch (e) {} });
+}
+function renderWs(subj, arg){
+  if (/^ws-compare/.test(arg)) { renderWsCmp(subj, arg); return; }
+  const m = arg.match(/^ws-([a-z]+)(?:-(\d+))?$/), slug = m && m[1], sets = m ? wsSets(subj, slug) : [];
+  if (!sets.length) { location.hash = subj; return; }
+  const si = Math.min(sets.length - 1, Math.max(0, (m[2] ? +m[2] : 1) - 1)), w = sets[si], CH = w.chapters, teacher = sets[0].teacher;
+  const UR = wsUnitRows(subj);
+  view.innerHTML = `<div class="wrap"><div class="notes wsp">
+    <div class="crumb" style="color:var(--sub)"><a href="#home">홈</a> › <a href="#${subj}">${SUBJ[subj]}</a> › 학습지 아카이브 › ${esc(teacher)}</div>
+    <h1>${esc(teacher)} <small>학습지</small></h1>
+    ${sets.length > 1 ? `<div class="wsp-sets">${sets.map((x, i) => `<a class="${i === si ? 'on' : ''}" href="#${subj}-ws-${slug}-${i + 1}">${esc(x.term)}</a>`).join('')}</div>` : ''}
+    <div class="wsp-head"><div><h2>${esc(w.title)}</h2><p>${esc(w.sub || '')}${w.sub ? ' · ' : ''}${w.pages}쪽</p></div>${w.file ? `<a class="notebtn" href="${esc(w.file)}" download>${w.file.split(".").pop().toUpperCase()} 다운로드 <span>↓</span></a>` : ''}</div>
+    <div class="nload" id="nload"><div class="ring"></div><p>학습지를 불러오는 중… <b id="nl-pct">0%</b></p><div class="ld-bar"><i id="nl-bar"></i></div></div>
+    <div id="nbody" hidden>
+      <div class="jumpbar" id="jumpbar">
+        <div class="jb-top"><button type="button" class="jb-arr" id="jb-prev" aria-label="이전">‹</button>
+          <button type="button" class="jb-now" id="jb-now" aria-expanded="false"><span class="jb-lb">목차</span><span class="jb-t" id="jb-t"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" class="jb-arr" id="jb-next" aria-label="다음">›</button></div>
+        <div class="jumps" id="jumps">${CH.map((c, i) => `<button type="button" class="cj" data-i="${i}"><b>${esc(c.n)}</b><span>${esc(c.title)}</span></button>`).join('')}</div>
+        <div class="jb-all" id="jb-all" hidden>${CH.map((c, i) => `<button type="button" class="ja" data-i="${i}"><b>${esc(c.n)}</b><span>${esc(c.title)}</span><i>${c.from}쪽</i></button>`).join('')}</div>
+      </div>
+      <div class="pgs" id="pgs"></div>
+      <div class="pnrow"><a class="pnbtn" href="#${subj}">← ${SUBJ[subj]} 자료로</a><a class="pnbtn" href="#" id="totop">맨 위로 ↑</a></div>
+    </div></div></div>`;
+  let cur = -1, lock = 0;
+  const bar = $('#jumpbar'), jumps = $('#jumps'), all = $('#jb-all'), nowBtn = $('#jb-now');
+  const barH = () => (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) + bar.offsetHeight + 16;
+  const anchor = i => $('#pg' + CH[i].from);
+  const setCur = (i, center) => {
+    if (i === cur) return; cur = i;
+    $$('.cj', jumps).forEach((x, k) => x.classList.toggle('on', k === i));
+    $$('.ja', all).forEach((x, k) => x.classList.toggle('on', k === i));
+    $('#jb-t').textContent = `${CH[i].n} · ${CH[i].title}`;
+    $('#jb-prev').disabled = i === 0; $('#jb-next').disabled = i === CH.length - 1;
+    const c = $$('.cj', jumps)[i]; if (c) jumps.scrollTo({ left: c.offsetLeft - (jumps.clientWidth - c.offsetWidth) / 2, behavior: center === false ? 'auto' : 'smooth' });
+  };
+  const go = i => { i = Math.max(0, Math.min(CH.length - 1, i)); const t = anchor(i); if (!t) return; setCur(i); lock = Date.now() + 900; window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH(), behavior: 'smooth' }); all.hidden = true; nowBtn.setAttribute('aria-expanded', 'false'); };
+  const spy = () => { if (Date.now() < lock) return; if (!document.body.contains(bar)) { removeEventListener('scroll', spy); return; } const line = barH() + 8; let k = 0; CH.forEach((c, i) => { const t = anchor(i); if (t && t.getBoundingClientRect().top <= line) k = i; }); setCur(k); };
+  addEventListener('scroll', spy, { passive: true });
+  jumps.addEventListener('click', e => { const c = e.target.closest('.cj'); if (c) go(+c.dataset.i); });
+  all.addEventListener('click', e => { const c = e.target.closest('.ja'); if (c) go(+c.dataset.i); });
+  nowBtn.addEventListener('click', () => { all.hidden = !all.hidden; nowBtn.setAttribute('aria-expanded', String(!all.hidden)); });
+  $('#jb-prev').addEventListener('click', () => go(cur - 1)); $('#jb-next').addEventListener('click', () => go(cur + 1));
+  $('#totop').addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  /* 들어올 때마다 이미지를 모두 받아 오며 로딩 표시 */
+  const t0 = Date.now(), pct = $('#nl-pct'), pb = $('#nl-bar'); let d = 0; const tot = w.pages;
+  const fin = () => setTimeout(() => {
+    const body = $('#nbody'); if (!body) return;
+    $('#pgs').innerHTML = Array.from({ length: tot }, (_, i) => { const p = i + 1, st = CH.find(c => c.from === p);
+      return `<figure class="pgf" id="pg${p}">${st ? `<figcaption class="pgc"><span>${esc(st.n)} · ${esc(st.title)}</span>${st.u && (UR.get(st.u) || {}).tn > 1 ? `<a class="pgc-c" href="#${subj}-ws-compare-${st.u}">다른 선생님과 비교 ›</a>` : ''}</figcaption>` : ''}<div class="pgw"><img src="${w.dir}/p-${p}.webp" alt="${esc(w.title)} ${p}쪽" draggable="false" width="${w.w}" height="${w.h}"></div></figure>`; }).join('');
+    body.hidden = false; const l = $('#nload'); if (l) l.remove(); setCur(0, false);
+    let wj = null; try { wj = JSON.parse(sessionStorage.getItem('wj') || 'null'); sessionStorage.removeItem('wj'); } catch (e) {}
+    if (wj && wj.id === w.id) { const t = $('#pg' + wj.p); if (t) { const ci = CH.reduce((a, c, i) => c.from <= wj.p ? i : a, 0); setCur(ci, false); window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH() }); } }
+  }, Math.max(0, 500 - (Date.now() - t0)));
+  for (let p = 1; p <= tot; p++) { const im = new Image(); im.onload = im.onerror = () => { d++; if (pct) pct.textContent = Math.round(d / tot * 100) + '%'; if (pb) pb.style.width = (d / tot * 100) + '%'; if (d === tot) fin(); }; im.src = `${w.dir}/p-${p}.webp`; }
+}
+/* ===== 단원별 비교 ===== */
+let cmpSel = null;
+function renderWsCmp(subj, arg){
+  const UR = wsUnitRows(subj), list = [...UR.values()].filter(e => e.rows.length);
+  if (!list.length) { location.hash = subj; return; }
+  const mu = arg.match(/^ws-compare-(u\d+)$/);
+  const cur = (mu && UR.get(mu[1]) && UR.get(mu[1]).rows.length ? UR.get(mu[1]) : list.find(e => e.tn > 1) || list[0]);
+  const idx = list.indexOf(cur), tn = new Map(); cur.rows.forEach(r => { if (!tn.has(r.w.slug)) tn.set(r.w.slug, r.w.teacher); });
+  const teachers = TEACHERS.filter(([k]) => tn.has(k)).map(([k]) => [k, tn.get(k)]);
+  const mob = matchMedia('(max-width:760px)').matches;
+  let sel = (cmpSel || []).filter(k => tn.has(k)); if (!sel.length || mob) sel = mob ? [(sel[0] || teachers[0][0])] : teachers.map(t => t[0]);
+  const groups = []; list.forEach(e => { let g = groups.find(x => x.g === e.u.g); if (!g) groups.push(g = { g: e.u.g, items: [] }); g.items.push(e); });
+  const pgs = r => r.from === r.to ? `${r.from}쪽` : `${r.from}~${r.to}쪽`;
+  view.innerHTML = `<div class="wrap"><div class="notes wsp cmp">
+    <div class="crumb" style="color:var(--sub)"><a href="#home">홈</a> › <a href="#${subj}">${SUBJ[subj]}</a> › 학습지 아카이브 › 단원별 비교</div>
+    <h1>단원별 비교 <small>학습지</small></h1>
+    <div class="cmp-pick"><button type="button" class="jb-arr" id="cp-prev" aria-label="이전 단원"${idx === 0 ? ' disabled' : ''}>‹</button>
+      <div class="cmp-sel"><select id="cp-sel" aria-label="단원 선택">${groups.map(g => `<optgroup label="${esc(g.g)}">${g.items.map(e => `<option value="${e.u.id}"${e === cur ? ' selected' : ''}>${esc(e.u.t)}${e.tn > 1 ? ` · ${e.tn}명` : ''}</option>`).join('')}</optgroup>`).join('')}</select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+      <button type="button" class="jb-arr" id="cp-next" aria-label="다음 단원"${idx === list.length - 1 ? ' disabled' : ''}>›</button></div>
+    <p class="cmp-note">${cur.tn > 1 ? `${cur.tn}명의 학습지를 나란히 볼 수 있어요.` : `이 단원은 ${esc(teachers[0][1])} 학습지만 있어요.`}</p>
+    ${teachers.length > 1 ? `<div class="cmp-t" id="cp-t">${teachers.map(([k, t]) => `<button type="button" data-k="${k}" class="${sel.includes(k) ? 'on' : ''}">${esc(t)}</button>`).join('')}</div>` : ''}
+    <div class="nload" id="nload"><div class="ring"></div><p>학습지를 불러오는 중… <b id="nl-pct">0%</b></p><div class="ld-bar"><i id="nl-bar"></i></div></div>
+    <div id="nbody" hidden><div class="cmp-cols" id="cp-cols"></div>
+      <div class="pnrow"><a class="pnbtn" href="#${subj}">← ${SUBJ[subj]} 자료로</a><a class="pnbtn" href="#" id="totop">맨 위로 ↑</a></div></div></div></div>`;
+  const col = ([k, t]) => { const rs = cur.rows.filter(r => r.w.slug === k);
+    return `<section class="cmp-c" data-k="${k}"><h3>${esc(t)}</h3>${rs.map(r => `<div class="cmp-b"><div class="cmp-bh"><div><b>${esc(r.c.n)} · ${esc(r.c.title)}</b><small>${esc(r.w.term)} · ${pgs(r)}</small></div>${r.w.file ? `<a href="${esc(r.w.file)}" download title="${esc(r.w.file.split('.').pop().toUpperCase())} 다운로드">${esc(r.w.file.split('.').pop().toUpperCase())} ↓</a>` : ''}</div>`
+      + Array.from({ length: r.to - r.from + 1 }, (_, i) => `<figure class="pgf"><div class="pgw"><img src="${r.w.dir}/p-${r.from + i}.webp" alt="${esc(t)} ${esc(r.c.title)} ${r.from + i}쪽" draggable="false" data-z="1" width="${r.w.w}" height="${r.w.h}"></div></figure>`).join('') + '</div>').join('')}</section>`; };
+  const paint = () => { const c = $('#cp-cols'); if (!c) return; const vis = teachers.filter(([k]) => sel.includes(k)); c.style.setProperty('--n', vis.length); c.innerHTML = vis.map(col).join(''); };
+  $$('#cp-t button').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.k, m = matchMedia('(max-width:760px)').matches;
+    if (m) sel = [k]; else if (sel.includes(k)) { if (sel.length > 1) sel = sel.filter(x => x !== k); } else sel = teachers.map(t => t[0]).filter(x => sel.includes(x) || x === k);
+    cmpSel = sel.slice(); $$('#cp-t button').forEach(x => x.classList.toggle('on', sel.includes(x.dataset.k))); paint();
+  }));
+  const goU = id => { location.hash = `${subj}-ws-compare-${id}`; };
+  $('#cp-sel').addEventListener('change', e => goU(e.target.value));
+  $('#cp-prev').addEventListener('click', () => goU(list[idx - 1].u.id)); $('#cp-next').addEventListener('click', () => goU(list[idx + 1].u.id));
+  $('#totop').addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  $('#cp-cols').addEventListener('click', e => { const im = e.target.closest('img[data-z]'); if (!im) return; const z = document.createElement('div'); z.className = 'lbx'; z.innerHTML = `<img src="${im.src}" alt="" draggable="false">`; const off = () => { z.remove(); removeEventListener('keydown', kk); }; const kk = ev => { if (ev.key === 'Escape') off(); }; z.addEventListener('click', off); addEventListener('keydown', kk); document.body.appendChild(z); });
+  /* 들어올 때마다 이미지를 모두 받아 오며 로딩 표시 */
+  const urls = []; cur.rows.forEach(r => { for (let p = r.from; p <= r.to; p++) urls.push(`${r.w.dir}/p-${p}.webp`); });
+  const t0 = Date.now(), pct = $('#nl-pct'), pb = $('#nl-bar'); let d = 0; const tot = urls.length;
+  const fin = () => setTimeout(() => { const body = $('#nbody'); if (!body) return; paint(); body.hidden = false; const l = $('#nload'); if (l) l.remove(); }, Math.max(0, 500 - (Date.now() - t0)));
+  urls.forEach(u => { const im = new Image(); im.onload = im.onerror = () => { d++; if (pct) pct.textContent = Math.round(d / tot * 100) + '%'; if (pb) pb.style.width = (d / tot * 100) + '%'; if (d === tot) fin(); }; im.src = u; });
+}
 function renderSubject(subj, arg){
   const units = UNITS[subj], cls = `s-${subj}`;
   const home = '<a href="#home">홈</a>';
   let unit = null;
   const GR = { busan:'부산역사교사모임' }, grp = subj === 'etc' && GR[arg] ? GR[arg] : null;
   if (subj === 'etc' && arg && arg.startsWith('gyegi')) { renderGyegi(arg.slice(6).replace(/^-/, '') || 'jeju43'); return; }
+  if (subj !== 'etc' && arg && /^ws-/.test(arg)) { renderWs(subj, arg); return; }
   if (subj !== 'etc' && arg && arg !== 'all') { unit = udec(arg); if (!units.some(u => u[0] === unit)) { location.hash = subj; return; } }
-  const items = DB.materials.filter(m => m.subject === subj && (unit == null || m.unit === unit) && (!grp || m.group === grp));
+  const items = DB.materials.filter(m => inSubj(m, subj) && (unit == null || m.unit === unit) && (!grp || m.group === grp));
   let crumb, title, img;
   if (subj === 'etc') { crumb = grp ? `${home} › <a href="#etc">기타자료</a> › ${grp}` : `${home} › 기타자료`; title = grp || '기타 수업자료'; img = bandImg('images/sections/etc.webp'); }
   else if (unit == null) { crumb = `${home} › ${SUBJ[subj]}`; title = `${SUBJ[subj]} 전체 자료`; img = bandImg(`images/sections/${subj}.webp`); }
   else { crumb = `${home} › <a href="#${subj}">${SUBJ[subj]}</a> › ${unitLabel(unit)}`; title = unit === '기타' ? `${SUBJ[subj]} 단원 외 자료` : unitTitle(subj, unit); img = bandImg(`images/units/${subj}-${ucode(unit)}.webp`, `images/sections/${subj}.webp`); }
-  const ub = subj === 'etc' ? '' : `<nav class="ubar" aria-label="단원"><a class="${unit == null ? 'on' : ''}" href="#${subj}">전체<i>${countOf(subj)}</i></a>${units.map(u => `<a class="${unit === u[0] ? 'on' : ''}" href="#${subj}-${ucode(u[0])}" title="${esc(unitTitle(subj, u[0]))}"><b>${u[0] === '기타' ? '외' : u[0]}</b><span>${esc(unitTitle(subj, u[0]))}</span><i>${countOf(subj, u[0])}</i></a>`).join('')}</nav>`;
-  view.innerHTML = band({ cls, crumb, title, desc: '', img }) + `<div class="wrap ${cls}">${ub}<section class="sec"><div id="lib"></div></section></div>`;
+  const ub = '';
+  view.innerHTML = band({ cls, crumb, title, desc: '', img }) + `<div class="wrap ${cls}">${subj !== 'etc' && unit == null ? wsHTML(subj) : ''}${ub}<section class="sec"><div id="lib"></div></section></div>`;
+  if (subj !== 'etc' && unit == null) initWs();
   mountList(items, null, subj !== 'etc' && unit == null ? subj : null, grp ? 'old' : undefined);
 }
 
@@ -431,8 +577,9 @@ function notesView(b){
   const barH = () => (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) + bar.offsetHeight + 16;
   const anchor = i => mode === 'text' ? $('#tc' + i) : $('#pg' + CH[i].from);
   /* ---- 글 렌더 ---- */
+  const cell = c => { if (!/(^|\s)[-–]\s/.test(c)) return esc(c); const p = c.split(/(?:^|\s)[-–]\s+/).map(x => x.trim()), head = p.shift(); const li = p.filter(Boolean); return (head ? `<span class="ch">${esc(head)}</span>` : '') + `<ul class="cl">${li.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`; };
   const tbl = rows => { const w = rows[0].length, hd = w >= 3 && rows.length > 1;
-    return `<div class="tbw"><table class="tt${w === 2 && rows.length > 1 ? ' c2' : ''}">${rows.map((r, ri) => `<tr>${r.map(c => (hd && ri === 0) ? `<th>${esc(c)}</th>` : `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`; };
+    return `<div class="tbw"><table class="tt${w === 2 && rows.length > 1 ? ' c2' : ''}">${rows.map((r, ri) => `<tr>${r.map(c => (hd && ri === 0) ? `<th>${esc(c)}</th>` : `<td>${cell(c)}</td>`).join('')}</tr>`).join('')}</table></div>`; };
   const blk = x => {
     switch (x.k) {
       case 'h': return `<h3>${esc(x.t)}</h3>`;
@@ -674,7 +821,7 @@ function initSearch(){
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
   $('.nav .wrap').appendChild(btn);
   const ov = document.createElement('div'); ov.className = 'sov'; ov.hidden = true;
-  ov.innerHTML = '<div class="sbox"><div class="sin"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="sq" type="search" placeholder="자료·책·모임 글 검색" autocomplete="off" enterkeyhint="search"><button type="button" class="sx" aria-label="닫기">×</button></div><div class="sres" id="sres"><p class="sh">검색어를 입력해 보세요.</p></div></div>';
+  ov.innerHTML = '<div class="sbox"><div class="sin"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="sq" type="search" placeholder="자료·책·모임 글·학습지 검색" autocomplete="off" enterkeyhint="search"><button type="button" class="sx" aria-label="닫기">×</button></div><div class="sres" id="sres"><p class="sh">검색어를 입력해 보세요.</p></div></div>';
   document.body.appendChild(ov);
   let notes = null, loading = null;
   const loadNotes = () => loading || (loading = Promise.all(DB.books.filter(b => b.notes && b.notes.text).map(b => fetch(b.notes.text).then(r => r.json()).then(d => ({ b, d })).catch(() => null))).then(a => { notes = a.filter(Boolean); }));
@@ -692,7 +839,7 @@ function initSearch(){
     const raw = $('#sq').value.trim().toLowerCase(), box = $('#sres'); if (!raw) { box.innerHTML = '<p class="sh">검색어를 입력해 보세요.</p>'; return; }
     const ts = raw.split(/\s+/).filter(Boolean), all = h => ts.every(q => h.includes(q));
     const mats = DB.materials.filter(m => all([m.title, m.desc, m.type, m.topic, m.author, (m.tags || []).join(' ')].join(' ').toLowerCase())).slice(0, 20)
-      .map(m => `<a class="sr" data-h="#material-${m.id}"><b>${hi(m.title, ts)}</b><small>${esc([SUBJ[m.subject], m.type].filter(Boolean).join(' · '))}</small></a>`);
+      .map(m => `<a class="sr" data-h="#material-${m.id}"><b>${hi(m.title, ts)}</b><small>${esc([subjOf(m), m.type].filter(Boolean).join(' · '))}</small></a>`);
     const bks = DB.books.filter(b => all([b.title, b.subtitle, b.author, b.intro].join(' ').toLowerCase()))
       .map(b => `<a class="sr" data-h="#books-${b.id}"><b>${hi(b.title, ts)}</b><small>${esc(b.author || '')}</small></a>`);
     const gy = Object.values(DB.gyegi || {}).filter(g => all([g.title, (g.topics || []).join(' '), (g.sections || []).map(x => x.title + ' ' + (x.items || []).map(i => i.title).join(' ')).join(' ')].join(' ').toLowerCase()))
@@ -703,17 +850,21 @@ function initSearch(){
       const hit = c.blocks.map(x => plain(x).join(' ')).find(t => all(t.toLowerCase())) || (all(c.title.toLowerCase()) ? c.title : null);
       if (hit) nt.push(`<a class="sr" data-h="#books-${b.id}-notes" data-c="${i}" data-q="${esc(ts[0])}"><b>제${c.n}장 · ${hi(c.title, ts)}</b><small>${hi(snip(hit, ts), ts)}</small></a>`);
     }));
-    const html = grp('수업·평가 자료', mats) + grp('독서 모임 글', nt) + grp('책', bks) + grp('계기 교육', gy);
+    const fw = wsFind(h => all(h.toLowerCase())),
+      wsr = fw.ws.slice(0, 20).map(({ w, c, href, p, sn }) => `<a class="sr" data-h="${href}" data-w="${w.id}" data-p="${p}"><b>${hi(c.n + ' · ' + c.title, ts)}</b><small>${esc(w.teacher)} · ${esc(w.term)} · ${p}쪽${sn ? ' — ' + hi(sn, ts) : ''}</small></a>`),
+      cmr = fw.cmp.slice(0, 12).map(({ e, href }) => `<a class="sr" data-h="${href}"><b>${hi(e.u.t, ts)}</b><small>단원별 비교 · ${e.tn}명의 학습지</small></a>`);
+    const html = grp('단원별 비교', cmr) + grp('학습지', wsr) + grp('수업·평가 자료', mats) + grp('독서 모임 글', nt) + grp('책', bks) + grp('계기 교육', gy);
     box.innerHTML = html || `<p class="sh">${notes ? '검색 결과가 없어요.' : '불러오는 중…'}</p>`;
     if (!notes && !html) loadNotes().then(run);
   };
   let tm = 0; $('#sq').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(run, 120); });
-  $('#sres').addEventListener('click', e => { const a = e.target.closest('.sr'); if (!a) return; go(a.dataset.h, a.dataset.c != null ? { c: +a.dataset.c, q: a.dataset.q } : null); });
+  $('#sres').addEventListener('click', e => { const a = e.target.closest('.sr'); if (!a) return; if (a.dataset.w) { try { sessionStorage.setItem('wj', JSON.stringify({ id: a.dataset.w, p: +a.dataset.p })); } catch (e) {} } go(a.dataset.h, a.dataset.c != null ? { c: +a.dataset.c, q: a.dataset.q } : null); });
 }
 async function init(){
   try {
-    const [m, b, a, g] = await Promise.all(['materials','books','about','gyegi'].map(n => fetch(`data/${n}.json`).then(r => r.json())));
-    DB.materials = m; DB.books = b; DB.about = a; DB.gyegi = g;
+    const [m, b, a, g, ws] = await Promise.all(['materials','books','about','gyegi','worksheets'].map(n => fetch(`data/${n}.json`).then(r => r.json()).catch(() => n === 'worksheets' ? [] : Promise.reject())));
+    DB.materials = m; DB.books = b; DB.about = a; DB.gyegi = g; DB.worksheets = ws || [];
+    try { DB.wsUnits = await fetch('data/ws-units.json').then(r => r.json()); } catch (e) { DB.wsUnits = {}; }
   } catch (e) {
     view.innerHTML = '<div class="empty" style="padding:80px 20px">자료를 불러오지 못했어요. 페이지를 새로고침해 주세요.</div>';
     hideLoader(); return;
