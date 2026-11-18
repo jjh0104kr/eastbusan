@@ -307,6 +307,8 @@ function renderHome(){
   </div>`;
   homeUnitOptions(); homeList(true);
   setNavH(); heroFx();
+  { const hh = () => { const h = $('#hero'); if (h) h.style.setProperty('--hh', Math.max(540, innerHeight - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 61)) + 'px'); };
+    hh(); addEventListener('orientationchange', () => setTimeout(hh, 300)); if (innerWidth > 1100) addEventListener('resize', hh); }
   const fxb = $('#fxbtn'), fxs = () => { const off = document.body.classList.contains('no-anim'); fxb.setAttribute('aria-pressed', off); fxb.innerHTML = off ? '<i></i>효과 켜기' : '<i></i>효과 끄기'; };
   fxs(); fxb.addEventListener('click', () => { const off = document.body.classList.toggle('no-anim'); try { localStorage.setItem('noanim', off ? '1' : ''); } catch (e) {} fxs(); });
   $('#hint').addEventListener('click', () => $('#board-sec').scrollIntoView({ behavior:'smooth', block:'start' }));
