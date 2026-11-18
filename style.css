@@ -893,3 +893,107 @@ body.no-anim .zoom,body.no-anim .glow,body.no-anim .beam{animation:none!importan
 
 /* 모바일: 주소창이 접혀도 배경 크기가 변하지 않도록 높이를 처음 값으로 고정 */
 @media(max-width:1100px){.hero{height:auto;min-height:var(--hh,calc(100svh - var(--nh,61px)))}.hero.compact{min-height:0;height:240px}}
+
+/* ===== 중국사 모임 자료: 글로 읽기 · 형광펜 ===== */
+.nt-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.nt-tabs{display:inline-flex;padding:4px;gap:2px;background:#f1e9d3;border-radius:999px}
+.nt-tabs button{border:0;background:none;padding:8px 18px;border-radius:999px;font:inherit;font-size:14.5px;font-weight:600;color:#6d6454;cursor:pointer;transition:background .2s,color .2s}
+.nt-tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 6px rgba(43,42,40,.12)}
+.hl-tools{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sub)}
+.hl-tools button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:12.5px;cursor:pointer;color:#7a4a2a}
+.hl-hint{margin:0 0 14px;font-size:13px;color:var(--sub);line-height:1.6}
+.hl-hint b{background:rgba(255,222,110,.6);padding:0 4px;border-radius:3px;color:var(--ink)}
+.tx-pane{max-width:760px;margin:0 auto}
+.tx,.tx *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.tx{background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 38px 28px;margin:0 0 22px;scroll-margin-top:150px;line-height:1.9;font-size:16px;color:#2b2a28;word-break:keep-all;overflow-wrap:break-word}
+.txh{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.txh small{display:block;font-size:13px;font-weight:700;color:#8a6a1e;letter-spacing:.02em;margin-bottom:6px}
+.txh h2{font-family:var(--sf);font-size:clamp(21px,3.4vw,27px);line-height:1.45;margin:0;font-weight:700;text-wrap:balance}
+.tx h3{font-family:var(--sf);font-size:18.5px;line-height:1.5;margin:30px 0 8px;padding-left:12px;border-left:4px solid var(--cheese);text-wrap:balance}
+.tx h4.sec{display:inline-block;margin:26px 0 4px;padding:3px 12px;border-radius:999px;background:#f3e7c6;color:#7a5a14;font-size:13.5px;font-weight:700;font-family:inherit}
+.tx p{margin:0 0 12px;text-wrap:pretty}
+.tx p.q{font-weight:700;color:#4a3a20;background:#faf3df;border-radius:12px;padding:12px 16px}
+.tx p.a{font-weight:700;margin-top:18px;margin-bottom:6px;color:#8a6a1e}
+.tx p.li{padding-left:2px;font-weight:600}
+.tx p.sum{padding:10px 14px;background:#f6f1e3;border-radius:12px;font-size:15.5px}
+.tx p.qt{margin-left:14px;padding-left:14px;border-left:3px solid #e2d6b4;color:#5c5546;font-size:15.5px}
+.tx .bx{margin:12px 0;padding:12px 16px;border:1px solid #d9cca8;border-radius:12px;background:#fffdf6}
+.tx .bx p{margin:0 0 6px;font-size:15.5px}.tx .bx p:last-child{margin:0}
+.tx .tbw{margin:14px 0;overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+.tx table.tt{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.7}
+.tx table.tt th{background:#f3e7c6;color:#5a4410;font-weight:700;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tx table.tt td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.tx table.tt tr:first-child td{border-top:0}
+.tx table.tt.c2 td:first-child{width:28%;font-weight:700;background:#fbf6e8}
+.tx .tfig{margin:14px 0;text-align:center}.tx .tfig img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.tx .fns{margin-top:22px;padding-top:12px;border-top:1px dashed #d9cca8;font-size:13.5px;color:#6d6454;line-height:1.75}
+.tx .fns h4{margin:0 0 6px;font-size:13px;font-family:inherit;color:#8a6a1e}
+.tx .fns p{margin:0 0 5px;font-size:13.5px}
+.tx .srcbtn{margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;color:#7a5a14;cursor:pointer}
+.tx .srcbtn:hover{background:#faf3df}
+mark.hl{background:rgba(255,222,110,.6);color:inherit;border-radius:3px;padding:.05em 0;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hlbar{position:fixed;z-index:300;display:flex;gap:4px;padding:5px;background:#2b2a28;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fade .15s ease both}
+.hlbar[hidden]{display:none}
+.hlbar button{border:0;background:none;color:#fff;font:inherit;font-size:14px;font-weight:700;padding:9px 18px;border-radius:999px;cursor:pointer}
+.hlbar button[hidden]{display:none}
+.hlbar #hl-add{background:rgba(255,222,110,.95);color:#3b2a08}
+.hlbar button:hover{filter:brightness(1.08)}
+@media(max-width:700px){.tx{padding:22px 18px 20px;border-radius:16px;font-size:15.5px}.tx h3{font-size:17px}.nt-tabs button{padding:8px 14px}.tx table.tt th{white-space:normal}}
+.nload[hidden],.pgs[hidden],#pane-text[hidden],#pane-img[hidden],.hl-tools[hidden],.hl-hint[hidden]{display:none!important}
+
+.nt-tabs{display:none!important}
+.hlbar{padding:4px;gap:2px}
+.hlbar button{width:44px;height:40px;padding:0;display:flex;align-items:center;justify-content:center}
+.totop-fab{position:fixed;right:14px;bottom:18px;z-index:250;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.94);color:#2b2a28;box-shadow:0 4px 16px rgba(43,42,40,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .25s,visibility .25s}
+.totop-fab.show{opacity:1;visibility:visible;transform:none}
+@media(max-width:700px){.totop-fab{right:10px;bottom:14px;width:40px;height:40px}}
+/* 형광펜 버튼: 작고 깔끔하게 */
+.hlbar{padding:3px;gap:0;background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(43,42,40,.16);border-radius:999px}
+.hlbar button{width:34px;height:34px;padding:0;border-radius:50%;background:none;color:#4a463e;display:flex;align-items:center;justify-content:center}
+.hlbar button svg{width:17px;height:17px}
+.hlbar #hl-add{background:rgba(255,222,110,.75);color:#4a3a10}
+.hlbar button:hover{filter:none;background:#f3ecd8}
+.hlbar #hl-add:hover{background:rgba(255,214,80,.95)}
+
+/* 검색 · 읽기 보조 */
+.nav .wrap{position:relative}
+.sbtn{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#4a463f;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.sbtn:hover{background:var(--soft)}
+@media(max-width:900px){.sbtn{position:absolute;right:14px;top:8px;width:34px;height:34px}}
+body.sopen{overflow:hidden}
+.sov{position:fixed;inset:0;z-index:400;background:rgba(43,42,40,.38);display:flex;justify-content:center;align-items:flex-start;padding:70px 16px 16px;animation:fade .15s ease both}
+.sov[hidden]{display:none}
+.sbox{width:100%;max-width:640px;max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);background:#fffdf8;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+.sin{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);color:#8a8272}
+.sin input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:16px;color:var(--ink);min-width:0;-webkit-user-select:text;user-select:text}
+.sin input::-webkit-search-cancel-button{display:none}
+.sx{border:0;background:none;font-size:24px;line-height:1;color:#8a8272;cursor:pointer;padding:0 4px}
+.sres{overflow-y:auto;padding:6px 8px 12px}
+.sh{margin:0;padding:26px 10px;text-align:center;color:var(--sub);font-size:14px}
+.sg h5{display:flex;align-items:center;gap:6px;margin:12px 8px 4px;font-size:12.5px;color:#8a6a1e;font-family:inherit}
+.sg h5 i{font-style:normal;background:#f3e7c6;border-radius:999px;padding:0 7px;font-size:11.5px}
+.sr{display:block;padding:9px 10px;border-radius:12px;cursor:pointer}
+.sr:hover{background:#f6f0df}
+.sr b{display:block;font-size:14.5px;font-weight:600;line-height:1.45;word-break:keep-all}
+.sr small{display:block;margin-top:2px;font-size:12.5px;color:var(--sub);line-height:1.5;word-break:keep-all}
+.sr mark{background:rgba(255,222,110,.6);color:inherit;border-radius:3px}
+.fsz{display:inline-flex;gap:2px;margin-right:4px}
+.hl-tools .fsz button{width:30px;height:30px;padding:0;border-radius:50%;color:#4a463f;line-height:1}
+.hl-tools .fsz button:disabled{opacity:.35;cursor:default}
+.tx{font-size:var(--tfs,16px)!important}
+.tx.flash,.tx .flash{animation:flashbg 1.6s ease}
+@keyframes flashbg{0%,60%{background-color:rgba(255,222,110,.45)}100%{background-color:transparent}}
+.resume{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:260;background:#2b2a28;color:#fff;border-radius:999px;padding:9px 12px 9px 18px;font-size:13.5px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .35s;white-space:nowrap}
+.resume.out{opacity:0}
+.resume button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:5px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.hlp{position:fixed;inset:0;z-index:380;background:rgba(43,42,40,.38);display:flex;align-items:center;justify-content:center;padding:16px}
+.hlp[hidden]{display:none}
+.hlp-in{width:100%;max-width:560px;max-height:80vh;max-height:80dvh;background:#fffdf8;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+.hlp-h{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font-size:15px}
+.hlp-x{border:0;background:none;font-size:24px;line-height:1;color:#8a8272;cursor:pointer}
+.hlp-l{overflow-y:auto;padding:4px 12px 14px}
+.hlp-l h5{margin:14px 6px 6px;font-size:12.5px;color:#8a6a1e;font-family:inherit;line-height:1.5;word-break:keep-all}
+.hli{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px}
+.hlg{flex:1;text-align:left;border:0;background:rgba(255,222,110,.35);border-radius:10px;padding:9px 12px;font:inherit;font-size:14px;line-height:1.65;color:var(--ink);cursor:pointer;word-break:keep-all}
+.hlr{flex:none;border:0;background:none;color:#8a8272;padding:10px 6px;cursor:pointer}
+@media(max-width:700px){.sov{padding-top:56px}.resume{bottom:64px}}

@@ -24,7 +24,7 @@ if (matchMedia('(hover:none)').matches) document.documentElement.classList.add('
 const artKey = m => m.subject === 'etc' ? 'etc-x' : m.subject === 'books' ? 'tile-books' : `${m.subject}-${ucode(m.unit)}`;
 const art = k => ART[k] || '';
 /* images/ 폴더에 같은 이름의 사진이 있으면 그림 위에 덮어서 보여 줘요 */
-const unitImg = k => /^(world|korea)-/.test(k) ? `<img class="ov" src="images/units/${k}.png" alt="" loading="lazy" onerror="this.remove()">` : '';
+const unitImg = k => /^(world|korea)-/.test(k) ? `<img class="ov" src="images/units/${k}.webp" alt="" loading="lazy" onerror="this.remove()">` : '';
 /* 페이지 맨 위 띠의 오른쪽 그림: 단원 그림이 없으면 과목 그림, 그것도 없으면 그림 없이 보여요 */
 const bandImg = (src, fb) => `<div class="band-img"><img src="${src}" alt="" onerror="${fb ? `if(!this.dataset.f){this.dataset.f=1;this.src='${fb}'}else{this.parentNode.remove()}` : 'this.parentNode.remove()'}"></div>`;
 const pic = k => art(k) + unitImg(k);
@@ -82,8 +82,8 @@ function renderMaterial(m){
     </div>
   </div>
   ${m.preview ? `<section class="pv" id="pv"><div class="pv-h"><h3>자료 미리보기</h3><span id="pv-n">1 / ${m.preview.pages}</span></div>
-    <div class="pv-main"><div class="pv-load" id="pv-load" role="status"><div class="ring"></div><p>미리보기를 불러오는 중… <b id="pv-pct">0%</b></p></div><button class="pv-b" id="pv-prev" type="button" aria-label="이전 쪽">‹</button><img id="pv-img" src="${esc(m.preview.dir)}/p-1.jpg" alt="${esc(m.title)} 1쪽" draggable="false"><button class="pv-b" id="pv-next" type="button" aria-label="다음 쪽">›</button></div>
-    <div class="pv-th">${Array.from({ length: m.preview.pages }, (_, k) => `<button type="button" class="${k ? '' : 'on'}" data-k="${k + 1}"><img src="${esc(m.preview.dir)}/p-${k + 1}.jpg" alt="" draggable="false" loading="lazy"></button>`).join('')}</div></section>` : ''}
+    <div class="pv-main"><div class="pv-load" id="pv-load" role="status"><div class="ring"></div><p>미리보기를 불러오는 중… <b id="pv-pct">0%</b></p></div><button class="pv-b" id="pv-prev" type="button" aria-label="이전 쪽">‹</button><img id="pv-img" src="${esc(m.preview.dir)}/p-1.webp" alt="${esc(m.title)} 1쪽" draggable="false"><button class="pv-b" id="pv-next" type="button" aria-label="다음 쪽">›</button></div>
+    <div class="pv-th">${Array.from({ length: m.preview.pages }, (_, k) => `<button type="button" class="${k ? '' : 'on'}" data-k="${k + 1}"><img src="${esc(m.preview.dir)}/p-${k + 1}.webp" alt="" draggable="false" loading="lazy"></button>`).join('')}</div></section>` : ''}
   <div class="mcards">${cards}</div>
   <div class="pnrow m-pn">${pv ? `<a class="pnbtn" href="#material-${pv.id}">← ${esc(pv.title)}</a>` : '<span class="pnbtn off">.</span>'}${nx ? `<a class="pnbtn" href="#material-${nx.id}">${esc(nx.title)} →</a>` : '<span class="pnbtn off">.</span>'}</div>
   </div>`;
@@ -94,15 +94,15 @@ function initPreview(m){
   pv.classList.add('loading'); let done = 0;
   const fin = () => { pv.classList.remove('loading'); const l = $('#pv-load'); if (l) setTimeout(() => l.remove(), 400); };
   const tm = setTimeout(fin, 60000);
-  Array.from({ length: N }, (_, k) => { const i = new Image(); i.onload = i.onerror = () => { done++; const p = $('#pv-pct'); if (p) p.textContent = Math.round(done / N * 100) + '%'; if (done >= N) { clearTimeout(tm); fin(); } }; i.src = `${m.preview.dir}/p-${k + 1}.jpg`; });
-  const go = n => { cur = Math.min(N, Math.max(1, n)); img.src = `${m.preview.dir}/p-${cur}.jpg`; img.alt = `${m.title} ${cur}쪽`; $('#pv-n').textContent = `${cur} / ${N}`; $$('.pv-th button', pv).forEach(b => b.classList.toggle('on', +b.dataset.k === cur)); };
+  Array.from({ length: N }, (_, k) => { const i = new Image(); i.onload = i.onerror = () => { done++; const p = $('#pv-pct'); if (p) p.textContent = Math.round(done / N * 100) + '%'; if (done >= N) { clearTimeout(tm); fin(); } }; i.src = `${m.preview.dir}/p-${k + 1}.webp`; });
+  const go = n => { cur = Math.min(N, Math.max(1, n)); img.src = `${m.preview.dir}/p-${cur}.webp`; img.alt = `${m.title} ${cur}쪽`; $('#pv-n').textContent = `${cur} / ${N}`; $$('.pv-th button', pv).forEach(b => b.classList.toggle('on', +b.dataset.k === cur)); };
   $('#pv-prev').addEventListener('click', () => go(cur - 1)); $('#pv-next').addEventListener('click', () => go(cur + 1));
   const open = () => {
     const lb = document.createElement('div'); lb.className = 'lb'; lb.setAttribute('role', 'dialog');
     lb.innerHTML = `<div class="lb-top"><span id="lb-n"></span><button type="button" id="lb-x" aria-label="닫기">×</button></div><div class="lb-stage" id="lb-stage"><img id="lb-img" alt="" draggable="false"></div><button class="lb-b" id="lb-p" type="button" aria-label="이전 쪽">‹</button><button class="lb-b" id="lb-nx" type="button" aria-label="다음 쪽">›</button><p class="lb-hint">이미지를 누르면 크게 볼 수 있어요</p>`;
     document.body.appendChild(lb); document.body.classList.add('lb-open');
     const li = $('#lb-img', lb), st = $('#lb-stage', lb);
-    const show = () => { li.src = `${m.preview.dir}/p-${cur}.jpg`; $('#lb-n', lb).textContent = `${m.title} · ${cur} / ${N}`; st.classList.remove('zoom'); st.scrollTo(0, 0); go(cur); };
+    const show = () => { li.src = `${m.preview.dir}/p-${cur}.webp`; $('#lb-n', lb).textContent = `${m.title} · ${cur} / ${N}`; st.classList.remove('zoom'); st.scrollTo(0, 0); go(cur); };
     const close = () => { lb.remove(); document.body.classList.remove('lb-open'); document.removeEventListener('keydown', key); };
     const key = e => { if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft' && cur > 1) { cur--; show(); } else if (e.key === 'ArrowRight' && cur < N) { cur++; show(); } };
     document.addEventListener('keydown', key);
@@ -121,13 +121,13 @@ function moveInd(box){
   ind.style.width = on.offsetWidth + 'px';
   ind.style.transform = `translateX(${on.offsetLeft}px)`;
 }
-/* 섹션 배너 배경: images/banners/{about,world,korea,books,etc}.jpg */
+/* 섹션 배너 배경: images/banners/{about,world,korea,books,etc}.webp */
 function bannerBg(){
   const b = $('.band'); if (!b) return;
   const k = b.dataset.k; if (!k) return;
   const i = new Image();
-  i.onload = () => { b.style.setProperty('--bnr', `url(images/banners/${k}.jpg)`); b.classList.add('own'); };
-  i.src = `images/banners/${k}.jpg`;
+  i.onload = () => { b.style.setProperty('--bnr', `url(images/banners/${k}.webp)`); b.classList.add('own'); };
+  i.src = `images/banners/${k}.webp`;
 }
 function band({ cls, crumb, title, desc, img }){
   const k = (cls.match(/s-(\w+)/) || [])[1] || '';
@@ -274,7 +274,7 @@ function renderHome(){
     <button class="fx-btn" id="fxbtn" type="button" aria-pressed="false"></button>
     <div class="hbg">
       <div class="stage"><div class="zoom">
-        <img class="heroimg" src="images/hero.jpg" alt="" fetchpriority="high">
+        <img class="heroimg" src="images/hero.webp" alt="" fetchpriority="high">
         <i class="glow"></i><i class="beam"></i>
         ${SPARKS.map(([x, y, sz, d]) => `<i class="sp" style="left:${x}%;top:${y}%;--s:${sz}px;--d:${d}s"></i>`).join('')}
       </div></div>
@@ -345,7 +345,7 @@ function renderGyegi(sub){
   const body = `<nav class="gy-nav" id="gy-nav">${nav.map(([id, t]) => `<a href="#" data-t="gy-${id}">${t}</a>`).join('')}</nav>
     <section class="gy-s" id="gy-topic"><h2>탐구 주제</h2><ol class="gy-topics">${d.topics.map(t => `<li>${esc(t)}</li>`).join('')}</ol>${(d.extra || []).length ? `<div class="gy-extra"><span>함께 다룰 주제</span>${d.extra.map(x => `<i>${esc(x)}</i>`).join('')}</div>` : ''}</section>
     ${d.sections.map(s => `<section class="gy-s" id="gy-${s.id}"><h2>${esc(s.title)}<i>${s.items.length}</i></h2>${R[s.kind](s)}</section>`).join('')}`;
-  view.innerHTML = band({ cls:'s-etc', crumb:`<a href="#home">홈</a> › <a href="#etc">기타자료</a> › 계기 교육`, title:'계기 교육', desc:'', img: bandImg('images/sections/etc.png') }) + `<div class="wrap s-etc gy">${ub}${tabs}${body}</div>`;
+  view.innerHTML = band({ cls:'s-etc', crumb:`<a href="#home">홈</a> › <a href="#etc">기타자료</a> › 계기 교육`, title:'계기 교육', desc:'', img: bandImg('images/sections/etc.webp') }) + `<div class="wrap s-etc gy">${ub}${tabs}${body}</div>`;
   $('#gy-nav').addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); const t = $('#' + a.dataset.t); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) - 18, behavior:'smooth' }); });
 }
 function renderSubject(subj, arg){
@@ -357,9 +357,9 @@ function renderSubject(subj, arg){
   if (subj !== 'etc' && arg && arg !== 'all') { unit = udec(arg); if (!units.some(u => u[0] === unit)) { location.hash = subj; return; } }
   const items = DB.materials.filter(m => m.subject === subj && (unit == null || m.unit === unit) && (!grp || m.group === grp));
   let crumb, title, img;
-  if (subj === 'etc') { crumb = grp ? `${home} › <a href="#etc">기타자료</a> › ${grp}` : `${home} › 기타자료`; title = grp || '기타 수업자료'; img = bandImg('images/sections/etc.png'); }
-  else if (unit == null) { crumb = `${home} › ${SUBJ[subj]}`; title = `${SUBJ[subj]} 전체 자료`; img = bandImg(`images/sections/${subj}.png`); }
-  else { crumb = `${home} › <a href="#${subj}">${SUBJ[subj]}</a> › ${unitLabel(unit)}`; title = unit === '기타' ? `${SUBJ[subj]} 단원 외 자료` : unitTitle(subj, unit); img = bandImg(`images/units/${subj}-${ucode(unit)}.png`, `images/sections/${subj}.png`); }
+  if (subj === 'etc') { crumb = grp ? `${home} › <a href="#etc">기타자료</a> › ${grp}` : `${home} › 기타자료`; title = grp || '기타 수업자료'; img = bandImg('images/sections/etc.webp'); }
+  else if (unit == null) { crumb = `${home} › ${SUBJ[subj]}`; title = `${SUBJ[subj]} 전체 자료`; img = bandImg(`images/sections/${subj}.webp`); }
+  else { crumb = `${home} › <a href="#${subj}">${SUBJ[subj]}</a> › ${unitLabel(unit)}`; title = unit === '기타' ? `${SUBJ[subj]} 단원 외 자료` : unitTitle(subj, unit); img = bandImg(`images/units/${subj}-${ucode(unit)}.webp`, `images/sections/${subj}.webp`); }
   const ub = subj === 'etc' ? '' : `<nav class="ubar" aria-label="단원"><a class="${unit == null ? 'on' : ''}" href="#${subj}">전체<i>${countOf(subj)}</i></a>${units.map(u => `<a class="${unit === u[0] ? 'on' : ''}" href="#${subj}-${ucode(u[0])}" title="${esc(unitTitle(subj, u[0]))}"><b>${u[0] === '기타' ? '외' : u[0]}</b><span>${esc(unitTitle(subj, u[0]))}</span><i>${countOf(subj, u[0])}</i></a>`).join('')}</nav>`;
   view.innerHTML = band({ cls, crumb, title, desc: '', img }) + `<div class="wrap ${cls}">${ub}<section class="sec"><div id="lib"></div></section></div>`;
   mountList(items, null, subj !== 'etc' && unit == null ? subj : null, grp ? 'old' : undefined);
@@ -374,7 +374,7 @@ function renderAbout(){
   const sec = (id, n, t, body) => `<section id="${id}" class="ab-s"><div class="ab-l"><b>${n}</b><h2>${esc(t)}</h2></div><div class="ab-r">${body}</div></section>`;
   const half = (S) => `<div class="ab-tag">${esc(S.tag)}</div><h3 class="ab-head">${esc(S.head)}</h3>${para(S.text)}${S.text2 ? para(S.text2) : ''}<h4 class="ab-sub">${esc(S.itemsTitle)}</h4>${rows(S.items)}${qs(S.qs)}`;
   const NAV = [['ab1', '활동 방향'], ['ab2', '상반기'], ['ab3', '하반기'], ['ab4', '2027년'], ['ab5', '연간 흐름'], ['ab6', '지향하는 수업']];
-  view.innerHTML = band({ cls:'s-about', crumb:'<a href="#home">홈</a> › 모임 소개', title:'모임 소개', desc:'', img: bandImg('images/sections/about.png') }) + `
+  view.innerHTML = band({ cls:'s-about', crumb:'<a href="#home">홈</a> › 모임 소개', title:'모임 소개', desc:'', img: bandImg('images/sections/about.webp') }) + `
   <div class="wrap s-about ab">
     <header class="ab-top"><span class="ab-eyebrow">동부산 역사교사모임</span><h2>${esc(A.lead)}</h2>${A.intro.map(para).join('')}
       <nav class="ab-nav" id="ab-nav">${NAV.map(([id, t]) => `<a href="#" data-t="${id}">${t}</a>`).join('')}</nav></header>
@@ -396,21 +396,21 @@ const COVER = ['s-books', 's-world', 's-korea'];
 function coverHTML(b){
   if (b.cover) return `<div class="cv real"><img src="${esc(b.cover)}" alt="${esc(b.title)} 표지" loading="lazy"></div>`;
   const n = (b.id - 1) % 3;
-  return `<div class="cv ${COVER[n]}"><img class="ov" src="images/books/${b.id}.jpg" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="this.remove()"><span class="t">${esc(b.title)}</span><span class="a">${esc(b.author)}</span></div>`;
+  return `<div class="cv ${COVER[n]}"><img class="ov" src="images/books/${b.id}.webp" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="this.remove()"><span class="t">${esc(b.title)}</span><span class="a">${esc(b.author)}</span></div>`;
 }
 const bookSub = b => [b.author, b.publisher, b.month ? fmt(esc(b.month)) : ''].filter(Boolean).join(' · ');
 /* 모임 자료(발표 PDF 전체를 쪽 그대로 보여 줌) */
 function notesView(b){
   const n = b.notes, pg = i => String(i).padStart(2, '0'), CH = n.chapters;
   const chip = (c, i) => `<button type="button" class="cj" data-i="${i}"><b>${String(c.n).padStart(2, '0')}</b><span>${esc(c.title)}</span></button>`;
-  const pages = Array.from({ length: n.pages }, (_, i) => {
-    const p = i + 1, st = CH.find(c => c.from === p);
-    return `<figure class="pgf ld" id="pg${p}">${st ? `<figcaption class="pgc">제${st.n}장 · ${esc(st.title)}${st.by ? ` · ${esc(st.by)}` : ''}</figcaption>` : ''}<div class="pgw"><img src="${n.dir}/p-${pg(p)}.jpg" alt="${esc(b.title)} 모임 자료 ${p}쪽" draggable="false" width="${n.w || ""}" height="${n.h || ""}"></div><span class="pgn">${p} / ${n.pages}</span></figure>`;
-  }).join('');
   view.innerHTML = `
   <div class="wrap"><div class="notes">
     <div class="crumb" style="color:var(--sub)"><a href="#home">홈</a> › <a href="#books">독서 모임</a> › <a href="#books-${b.id}">${esc(b.title)}</a></div>
     <h1>${esc(b.title)} <small>모임 자료</small></h1>
+    <div class="nt-top">
+      
+      <div class="hl-tools" id="hl-tools"><span class="fsz"><button type="button" id="fs-m" aria-label="글자 작게" style="font-size:12px">가</button><button type="button" id="fs-p" aria-label="글자 크게" style="font-size:17px">가</button></span><span id="hl-n"></span><button type="button" id="hl-list" hidden>모아보기</button><button type="button" id="hl-clear" hidden>모두 지우기</button></div>
+    </div>
     <div class="nload" id="nload"><div class="ring"></div><p>모임 자료를 불러오는 중… <b id="nl-pct">0%</b></p><div class="ld-bar"><i id="nl-bar"></i></div></div>
     <div id="nbody" hidden>
     <div class="jumpbar" id="jumpbar">
@@ -420,18 +420,125 @@ function notesView(b){
       <div class="jumps" id="jumps">${CH.map(chip).join('')}</div>
       <div class="jb-all" id="jb-all" hidden>${CH.map((c, i) => `<button type="button" class="ja" data-i="${i}"><b>${String(c.n).padStart(2, '0')}</b><span>${esc(c.title)}</span>${c.by ? `<i>${esc(c.by)}</i>` : ''}</button>`).join('')}</div>
     </div>
-    <div class="pgs">${pages}</div>
+    <p class="hl-hint" id="hl-hint">글을 드래그해서 선택하면 형광펜 아이콘이 나와요. 칠한 곳을 누르면 지울 수 있어요. (이 기기에만 저장돼요)</p>
+    <div id="pane-text" class="tx-pane"></div>
+    <div class="pgs" id="pgs"></div></div>
     <div class="pnrow"><a class="pnbtn" href="#books-${b.id}">← 책 소개로</a><a class="pnbtn" href="#" id="totop">맨 위로 ↑</a></div>
     </div>
   </div></div>`;
-  { let d = 0; const pct = $('#nl-pct'), bar = $('#nl-bar'), tot = n.pages;
-    const fin = () => { const el = $('#nbody'); if (el) { el.hidden = false; const l = $('#nload'); if (l) l.remove(); } };
-    for (let p = 1; p <= tot; p++) { const i = new Image(); i.onload = i.onerror = () => { d++; if (pct) pct.textContent = Math.round(d / tot * 100) + '%'; if (bar) bar.style.width = (d / tot * 100) + '%'; if (d === tot) fin(); }; i.src = `${n.dir}/p-${pg(p)}.jpg`; }
-  }
-  $$('.pgf img').forEach(im => { const done = () => im.closest('.pgf').classList.remove('ld'); im.complete && im.naturalWidth ? done() : (im.onload = done, im.onerror = done); });
+  let mode = 'text', TX = null, imgBuilt = false, cur = -1, lock = 0;
   const bar = $('#jumpbar'), jumps = $('#jumps'), all = $('#jb-all'), nowBtn = $('#jb-now');
   const barH = () => (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) + bar.offsetHeight + 16;
-  let cur = -1;
+  const anchor = i => mode === 'text' ? $('#tc' + i) : $('#pg' + CH[i].from);
+  /* ---- 글 렌더 ---- */
+  const tbl = rows => { const w = rows[0].length, hd = w >= 3 && rows.length > 1;
+    return `<div class="tbw"><table class="tt${w === 2 && rows.length > 1 ? ' c2' : ''}">${rows.map((r, ri) => `<tr>${r.map(c => (hd && ri === 0) ? `<th>${esc(c)}</th>` : `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`; };
+  const blk = x => {
+    switch (x.k) {
+      case 'h': return `<h3>${esc(x.t)}</h3>`;
+      case 'sec': return `<h4 class="sec">${esc(x.t)}</h4>`;
+      case 'q': return `<p class="q">${esc(x.t)}</p>`;
+      case 'a': return `<p class="a">${esc(x.t)}</p>`;
+      case 'li': return `<p class="li">${esc(x.t)}</p>`;
+      case 'sum': return `<p class="sum">${esc(x.t)}</p>`;
+      case 'quote': return `<p class="qt">${esc(x.t)}</p>`;
+      case 'box': return `<div class="bx">${x.t.map(t => `<p>${esc(t)}</p>`).join('')}</div>`;
+      case 'tbl': return tbl(x.rows);
+      case 'img': return `<figure class="tfig"><img src="${esc(x.src)}" alt="${esc(x.alt || '')}" draggable="false" loading="lazy"></figure>`;
+      default: return `<p>${esc(x.t)}</p>`;
+    }
+  };
+  const art = (c, i, meta) => {
+    const fns = c.blocks.filter(x => x.k === 'fn'), body = c.blocks.filter(x => x.k !== 'fn');
+    return `<article class="tx" id="tc${i}" data-c="${i}"><header class="txh"><small>제${c.n}장${c.by ? ` · ${esc(c.by)}` : ''}</small><h2>${esc(c.title)}</h2></header>${body.map(blk).join('')}${fns.length ? `<aside class="fns"><h4>각주</h4>${fns.map(f => `<p>${esc(f.t)}</p>`).join('')}</aside>` : ''}</article>`;
+  };
+  /* ---- 형광펜 ---- */
+  const HK = 'hl-china'; let HL = {};
+  try { HL = JSON.parse(localStorage.getItem(HK) || '{}') || {}; } catch (e) { HL = {}; }
+  const persist = () => { try { localStorage.setItem(HK, JSON.stringify(HL)); } catch (e) {} };
+  const merge = a => { const s = a.map(x => [x[0], x[1]]).sort((p, q) => p[0] - q[0]), o = []; s.forEach(x => { const l = o[o.length - 1]; if (l && x[0] <= l[1]) l[1] = Math.max(l[1], x[1]); else o.push(x); }); return o; };
+  const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), a = []; let t; while ((t = w.nextNode())) a.push(t); return a; };
+  const applyHL = a => {
+    $$('mark.hl', a).forEach(m => { const p = m.parentNode; while (m.firstChild) p.insertBefore(m.firstChild, m); p.removeChild(m); });
+    a.normalize();
+    const iv = merge(HL[a.dataset.c] || []); if (!iv.length) return;
+    let pos = 0; const per = [];
+    textNodes(a).forEach(nd => { const len = nd.nodeValue.length, loc = []; iv.forEach(([s, e]) => { const st = Math.max(s, pos), en = Math.min(e, pos + len); if (st < en) loc.push([st - pos, en - pos, s]); }); if (loc.length) per.push([nd, loc]); pos += len; });
+    per.forEach(([nd, loc]) => { loc.sort((p, q) => q[0] - p[0]).forEach(([s, e, g]) => { const mid = nd.splitText(s); mid.splitText(e - s); const m = document.createElement('mark'); m.className = 'hl'; m.dataset.s = g; mid.parentNode.insertBefore(m, mid); m.appendChild(mid); }); });
+  };
+  const count = () => Object.values(HL).reduce((t, a) => t + merge(a).length, 0);
+  const upd = () => { const k = count(); $('#hl-n').textContent = k ? `형광펜 ${k}곳` : ''; $('#hl-clear').hidden = !k; $('#hl-list').hidden = !k; };
+  const offsets = (a, r) => { const pre = document.createRange(); pre.selectNodeContents(a); pre.setEnd(r.startContainer, r.startOffset); const s = pre.toString().length; return [s, s + r.toString().length]; };
+  const artOf = nd => { const el = nd && (nd.nodeType === 1 ? nd : nd.parentElement); return el ? el.closest('.tx') : null; };
+  const hb = document.createElement('div'); hb.className = 'hlbar'; hb.hidden = true; hb.innerHTML = '<button type="button" id="hl-add" aria-label="형광펜 칠하기" title="형광펜"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button><button type="button" id="hl-del" aria-label="형광펜 지우기" title="지우기"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'; document.body.appendChild(hb);
+  let pend = null;
+  const place = rect => { hb.hidden = false; const w = hb.offsetWidth || 90, x = Math.max(8, Math.min(innerWidth - w - 8, rect.left + rect.width / 2 - w / 2)); let y = rect.bottom + 12; if (y + 50 > innerHeight) y = Math.max(8, rect.top - 54); hb.style.left = x + 'px'; hb.style.top = y + 'px'; };
+  const hide = () => { hb.hidden = true; pend = null; };
+  const placeEnd = sel => { const r = document.createRange(); try { r.setStart(sel.focusNode, sel.focusOffset); } catch (e) { return place(sel.getRangeAt(0).getBoundingClientRect()); } r.collapse(true);
+    let rc = r.getClientRects()[0]; if (!rc || !rc.height) { const full = sel.getRangeAt(0).getClientRects(); const f = sel.focusNode === sel.getRangeAt(0).startContainer && sel.focusOffset === sel.getRangeAt(0).startOffset; rc = f ? full[0] : full[full.length - 1]; if (!rc) return; rc = f ? { left: rc.left, right: rc.left, top: rc.top, bottom: rc.bottom, height: rc.height } : { left: rc.right, right: rc.right, top: rc.top, bottom: rc.bottom, height: rc.height }; }
+    hb.hidden = false; const w = hb.offsetWidth || 80, h = hb.offsetHeight || 40; let x = rc.right + 10, y = rc.top + rc.height / 2 - h / 2;
+    if (x + w > innerWidth - 8) x = Math.max(8, rc.right - w - 4), y = rc.bottom + 6; y = Math.max(8, Math.min(innerHeight - h - 8, y)); hb.style.left = x + 'px'; hb.style.top = y + 'px'; };
+  const onSel = () => {
+    if (mode !== 'text') return hide();
+    const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) { if (!pend || pend.t !== 'del') hide(); return; }
+    const r = sel.getRangeAt(0), a = artOf(r.startContainer); if (!a || !document.body.contains(a)) return hide();
+    const [s, e0] = offsets(a, r), e = Math.min(e0, a.textContent.length); if (e <= s) return hide();
+    pend = { t: 'add', a, s, e }; $('#hl-add').hidden = false; $('#hl-del').hidden = true; placeEnd(sel);
+  };
+  let tm = 0; const selH = () => { clearTimeout(tm); tm = setTimeout(onSel, 120); };
+  document.addEventListener('selectionchange', selH);
+  $('#hl-add', hb).addEventListener('click', () => { if (!pend || pend.t !== 'add') return; const k = pend.a.dataset.c; (HL[k] = HL[k] || []).push([pend.s, pend.e]); HL[k] = merge(HL[k]); persist(); applyHL(pend.a); getSelection().removeAllRanges(); hide(); upd(); });
+  $('#hl-del', hb).addEventListener('click', () => { if (!pend || pend.t !== 'del') return; const k = pend.a.dataset.c; HL[k] = merge(HL[k] || []).filter(([s, e]) => !(s < pend.e && e > pend.s)); persist(); applyHL(pend.a); hide(); upd(); });
+  const onClickMark = e => { const m = e.target.closest && e.target.closest('mark.hl'); if (!m) return; const sel = getSelection(); if (sel && !sel.isCollapsed) return; const a = artOf(m), r = document.createRange(); r.selectNodeContents(m); const [s, e2] = offsets(a, r); pend = { t: 'del', a, s, e: e2 }; $('#hl-add').hidden = true; $('#hl-del').hidden = false; const rs = m.getClientRects(), lr = rs[rs.length - 1] || m.getBoundingClientRect(); hb.hidden = false; const w = hb.offsetWidth || 44, h = hb.offsetHeight || 40; let x = lr.right + 8, y = lr.top + lr.height / 2 - h / 2; if (x + w > innerWidth - 8) { x = Math.max(8, lr.right - w); y = lr.bottom + 6; } y = Math.max(8, Math.min(innerHeight - h - 8, y)); hb.style.left = x + 'px'; hb.style.top = y + 'px'; };
+  $('#pane-text').addEventListener('click', onClickMark);
+  const offTap = e => { if (!hb.hidden && !hb.contains(e.target) && !(e.target.closest && e.target.closest('mark.hl'))) { const sel = getSelection(); if (!sel || sel.isCollapsed) hide(); } };
+  document.addEventListener('pointerdown', offTap);
+  /* 글자 크기 */
+  const FS = [14, 15, 16, 17, 18, 20]; let fi = 2; try { const v = +localStorage.getItem('nfs'); if (v >= 0 && v < FS.length && localStorage.getItem('nfs') !== null) fi = v; } catch (e) {}
+  const applyFs = () => { $('#pane-text').style.setProperty('--tfs', FS[fi] + 'px'); $('#fs-m').disabled = fi === 0; $('#fs-p').disabled = fi === FS.length - 1; try { localStorage.setItem('nfs', fi); } catch (e) {} };
+  $('#fs-m').addEventListener('click', () => { if (fi > 0) { fi--; applyFs(); } });
+  $('#fs-p').addEventListener('click', () => { if (fi < FS.length - 1) { fi++; applyFs(); } });
+  applyFs();
+  /* 형광펜 모아보기 */
+  const pnl = document.createElement('div'); pnl.className = 'hlp'; pnl.hidden = true; document.body.appendChild(pnl);
+  const closeP = () => { pnl.hidden = true; };
+  const jumpTo = el => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - barH(), behavior: 'auto' });
+  const openP = () => {
+    const rows = []; Object.keys(HL).map(Number).sort((a, b) => a - b).forEach(c => { const a = $('#tc' + c); if (!a) return; const txt = a.textContent; merge(HL[c] || []).forEach(([s, e]) => rows.push({ c, s, e, t: txt.slice(s, e).replace(/\s+/g, ' ').trim() })); });
+    let last = -1;
+    pnl.innerHTML = `<div class="hlp-in"><div class="hlp-h"><b>형광펜 모아보기</b><button type="button" class="hlp-x" aria-label="닫기">×</button></div><div class="hlp-l">${rows.length ? rows.map(r => `${r.c !== last ? (last = r.c, `<h5>제${CH[r.c].n}장 · ${esc(CH[r.c].title)}</h5>`) : ''}<div class="hli"><button type="button" class="hlg" data-c="${r.c}" data-s="${r.s}">${esc(r.t.length > 140 ? r.t.slice(0, 140) + '…' : r.t)}</button><button type="button" class="hlr" data-c="${r.c}" data-s="${r.s}" data-e="${r.e}" aria-label="지우기"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div>`).join('') : '<p class="bempty">칠한 곳이 없어요.</p>'}</div></div>`;
+    pnl.hidden = false;
+  };
+  $('#hl-list').addEventListener('click', openP);
+  pnl.addEventListener('click', e => {
+    if (e.target === pnl || e.target.closest('.hlp-x')) return closeP();
+    const g = e.target.closest('.hlg'); if (g) { closeP(); const a = $('#tc' + g.dataset.c), m = a && a.querySelector(`mark.hl[data-s="${g.dataset.s}"]`); if (m) jumpTo(m); return; }
+    const r = e.target.closest('.hlr'); if (r) { const k = r.dataset.c, s = +r.dataset.s, en = +r.dataset.e; HL[k] = merge(HL[k] || []).filter(([a, b]) => !(a === s && b === en)); persist(); applyHL($('#tc' + k)); upd(); openP(); }
+  });
+  const cleanup = () => { if (!document.body.contains(bar)) { document.removeEventListener('selectionchange', selH); document.removeEventListener('pointerdown', offTap); removeEventListener('hashchange', cleanup); hb.remove(); pnl.remove(); return true; } return false; };
+  addEventListener('hashchange', cleanup);
+  let armed = 0;
+  $('#hl-clear').addEventListener('click', e => { const b2 = e.currentTarget; if (!armed) { armed = 1; b2.textContent = '정말 지울까요? 한 번 더 누르세요'; setTimeout(() => { armed = 0; b2.textContent = '모두 지우기'; }, 3000); return; } armed = 0; HL = {}; persist(); $$('.tx').forEach(applyHL); b2.textContent = '모두 지우기'; upd(); closeP(); });
+  /* ---- 원본 쪽 이미지 ---- */
+  const buildImgs = () => {
+    const pages = Array.from({ length: n.pages }, (_, i) => { const p = i + 1, st = CH.find(c => c.from === p);
+      return `<figure class="pgf ld" id="pg${p}">${st ? `<figcaption class="pgc">제${st.n}장 · ${esc(st.title)}${st.by ? ` · ${esc(st.by)}` : ''}</figcaption>` : ''}<div class="pgw"><img src="${n.dir}/p-${pg(p)}.webp" alt="${esc(b.title)} 모임 자료 ${p}쪽" draggable="false" width="${n.w || ''}" height="${n.h || ''}"></div></figure>`; }).join('');
+    $('#pgs').innerHTML = pages; imgBuilt = true;
+    $$('.pgf img').forEach(im => { const done = () => im.closest('.pgf').classList.remove('ld'); im.complete && im.naturalWidth ? done() : (im.onload = done, im.onerror = done); });
+  };
+  const loadImgs = cb => {
+    const ld = $('#iload'), pct = $('#il-pct'), bar2 = $('#il-bar'); ld.hidden = false; $('#pgs').hidden = true; const t0 = Date.now(); let d = 0; const tot = n.pages;
+    const fin = () => { setTimeout(() => { ld.hidden = true; $('#pgs').hidden = false; cb && cb(); }, Math.max(0, 500 - (Date.now() - t0))); };
+    for (let p = 1; p <= tot; p++) { const i = new Image(); i.onload = i.onerror = () => { d++; pct.textContent = Math.round(d / tot * 100) + '%'; bar2.style.width = (d / tot * 100) + '%'; if (d === tot) fin(); }; i.src = `${n.dir}/p-${pg(p)}.webp`; }
+  };
+  /* ---- 모드 전환 · 목차 ---- */
+  const setMode = (m, after) => {
+    mode = m; hide(); $$('.nt-tabs button').forEach(x => x.classList.toggle('on', x.dataset.m === m));
+    $('#pane-text').hidden = m !== 'text'; $('#pane-img').hidden = m !== 'img';
+    $('#hl-tools').hidden = m !== 'text'; $('#hl-hint').hidden = m !== 'text';
+    if (m === 'img') { if (!imgBuilt) buildImgs(); loadImgs(() => { after && after(); }); } else { after && after(); }
+    cur = -1; setCur(0, false);
+  };
   const setCur = (i, center) => {
     if (i === cur) return; cur = i;
     $$('.cj', jumps).forEach((x, k) => x.classList.toggle('on', k === i));
@@ -443,19 +550,20 @@ function notesView(b){
   };
   const go = i => {
     i = Math.max(0, Math.min(CH.length - 1, i));
-    const t = $('#pg' + CH[i].from);
+    const t = anchor(i); if (!t) return;
     setCur(i); lock = Date.now() + 900;
     window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH(), behavior: 'smooth' });
     all.hidden = true; nowBtn.setAttribute('aria-expanded', 'false');
   };
-  let lock = 0;
   const spy = () => {
     if (Date.now() < lock) return;
     if (!document.body.contains(bar)) { removeEventListener('scroll', spy); return; }
     const line = barH() + 8; let k = 0;
-    CH.forEach((c, i) => { const t = $('#pg' + c.from); if (t && t.getBoundingClientRect().top <= line) k = i; });
+    CH.forEach((c, i) => { const t = anchor(i); if (t && !t.closest('[hidden]') && t.getBoundingClientRect().top <= line) k = i; });
     setCur(k);
+    clearTimeout(sv); sv = setTimeout(() => { const t = anchor(k); if (!t) return; try { localStorage.setItem('nread', JSON.stringify({ c: k, o: Math.max(0, Math.round(line - t.getBoundingClientRect().top)) })); } catch (e) {} }, 400);
   };
+  let sv = 0;
   addEventListener('scroll', spy, { passive: true });
   jumps.addEventListener('click', e => { const c = e.target.closest('.cj'); if (c) go(+c.dataset.i); });
   all.addEventListener('click', e => { const c = e.target.closest('.ja'); if (c) go(+c.dataset.i); });
@@ -463,12 +571,38 @@ function notesView(b){
   $('#jb-prev').addEventListener('click', () => go(cur - 1));
   $('#jb-next').addEventListener('click', () => go(cur + 1));
   $('#totop').addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  setCur(0, false);
+  $$('.nt-tabs button').forEach(x => x.addEventListener('click', () => { if (x.dataset.m !== mode) { const i = Math.max(0, cur); setMode(x.dataset.m, () => { const t = anchor(i); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH(), behavior: 'auto' }); }); } }));
+  $('#pane-text').addEventListener('click', e => { const sb = e.target.closest('.srcbtn'); if (!sb) return; const p = +sb.dataset.p; setMode('img', () => { const t = $('#pg' + p); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - barH(), behavior: 'auto' }); }); });
+  /* ---- 시작: 글 불러오기 ---- */
+  const t0 = Date.now(), pctEl = $('#nl-pct'), barEl = $('#nl-bar');
+  let fake = 0; const tick = setInterval(() => { fake = Math.min(90, fake + 12); if (pctEl) pctEl.textContent = fake + '%'; if (barEl) barEl.style.width = fake + '%'; }, 90);
+  fetch(n.text).then(r => r.json()).then(d => { TX = d; }).catch(() => { TX = []; }).then(() => {
+    clearInterval(tick);
+    const show = () => {
+      const el = $('#nbody'); if (!el) return;
+      $('#pane-text').innerHTML = TX.length ? TX.map((c, i) => art(c, i, CH[i] || { from: 1, to: 1 })).join('') : '<p class="bempty">글 자료를 불러오지 못했어요. 위의 “원본 쪽 보기”로 확인해 주세요.</p>';
+      $$('.tx').forEach(applyHL); upd(); el.hidden = false; const l = $('#nload'); if (l) l.remove(); setCur(0, false);
+      let nj = null; try { nj = JSON.parse(sessionStorage.getItem('nj') || 'null'); sessionStorage.removeItem('nj'); } catch (e) {}
+      if (nj && $('#tc' + nj.c)) {
+        let t = $('#tc' + nj.c); if (nj.q) { const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT); let nd; while ((nd = w.nextNode())) { if (nd.nodeValue.toLowerCase().includes(nj.q)) { t = nd.parentElement; break; } } }
+        jumpTo(t); setCur(nj.c, false); t.classList.add('flash'); setTimeout(() => t.classList.remove('flash'), 1800);
+      } else {
+        let rd = null; try { rd = JSON.parse(localStorage.getItem('nread') || 'null'); } catch (e) {}
+        const a = rd && $('#tc' + rd.c);
+        if (a && (rd.c > 0 || rd.o > 300)) {
+          window.scrollTo({ top: a.getBoundingClientRect().top + scrollY + rd.o - barH() - 8, behavior: 'auto' }); setCur(rd.c, false);
+          const rs = document.createElement('div'); rs.className = 'resume'; rs.innerHTML = `제${CH[rd.c].n}장에서 이어 읽고 있어요 <button type="button">처음부터</button>`; document.body.appendChild(rs);
+          const rm = () => { rs.classList.add('out'); setTimeout(() => rs.remove(), 400); }; rs.querySelector('button').addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'auto' }); rm(); }); setTimeout(rm, 5000);
+        }
+      }
+    };
+    setTimeout(show, Math.max(0, 450 - (Date.now() - t0)));
+  });
 }
 function renderBooks(arg){
   const crumbHome = '<a href="#home">홈</a>';
   if (!arg) {
-    view.innerHTML = band({ cls:'s-books', crumb:`${crumbHome} › 독서 모임`, title:'독서 모임', desc:'책을 누르면 소개와 모임 자료를 볼 수 있어요.', img: bandImg('images/sections/books.png') }) + `
+    view.innerHTML = band({ cls:'s-books', crumb:`${crumbHome} › 독서 모임`, title:'독서 모임', desc:'책을 누르면 소개와 모임 자료를 볼 수 있어요.', img: bandImg('images/sections/books.webp') }) + `
     <div class="wrap"><section class="sec"><div class="sec-h"><h2>2026</h2><span>${DB.books.length}권</span></div>
       <div class="shelf">${[...DB.books].sort((x, y) => (x.half === '상반기' ? 0 : 1) - (y.half === '상반기' ? 0 : 1)).map((b, i) => `<a class="bk" style="--i:${i}" href="#books-${b.id}">${coverHTML(b)}<em class="bk-tag">${esc(b.half || '')}</em><strong>${esc(b.title)}</strong><small>${esc(bookSub(b))}</small></a>`).join('')}</div>
     </section></div>`;
@@ -529,7 +663,53 @@ function preload(urls, ms){
 const hideLoader = () => { const l = $('#loader'); if (!l) return; l.classList.add('out'); setTimeout(() => l.remove(), 600); };
 /* 드래그·선택 막기 */
 addEventListener('dragstart', e => e.preventDefault());
-addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input,textarea')) e.preventDefault(); });
+addEventListener('selectstart', e => { const el = e.target && (e.target.nodeType === 1 ? e.target : e.target.parentElement); if (!el || !el.closest('input,textarea,.tx')) e.preventDefault(); });
+(() => { const b = document.createElement('button'); b.type = 'button'; b.className = 'totop-fab'; b.setAttribute('aria-label', '맨 위로'); b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>'; document.body.appendChild(b);
+  const t = () => b.classList.toggle('show', scrollY > 500); addEventListener('scroll', t, { passive: true }); t();
+  b.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' })); })();
+
+/* ===== 통합 검색 ===== */
+function initSearch(){
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'sbtn'; btn.id = 'sbtn'; btn.setAttribute('aria-label', '검색');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+  $('.nav .wrap').appendChild(btn);
+  const ov = document.createElement('div'); ov.className = 'sov'; ov.hidden = true;
+  ov.innerHTML = '<div class="sbox"><div class="sin"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="sq" type="search" placeholder="자료·책·모임 글 검색" autocomplete="off" enterkeyhint="search"><button type="button" class="sx" aria-label="닫기">×</button></div><div class="sres" id="sres"><p class="sh">검색어를 입력해 보세요.</p></div></div>';
+  document.body.appendChild(ov);
+  let notes = null, loading = null;
+  const loadNotes = () => loading || (loading = Promise.all(DB.books.filter(b => b.notes && b.notes.text).map(b => fetch(b.notes.text).then(r => r.json()).then(d => ({ b, d })).catch(() => null))).then(a => { notes = a.filter(Boolean); }));
+  const plain = x => (x.t != null ? [x.t] : []).concat(x.rows ? x.rows.flat() : []);
+  const hi = (t, ts) => { let o = esc(t); ts.forEach(q => { const e = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); o = o.replace(new RegExp(e, 'gi'), m => `<mark>${m}</mark>`); }); return o; };
+  const snip = (t, ts) => { const l = t.toLowerCase(); let i = Math.min(...ts.map(q => { const k = l.indexOf(q); return k < 0 ? 1e9 : k; })); if (i > 1e8) i = 0; const a = Math.max(0, i - 28); return (a ? '…' : '') + t.slice(a, a + 90) + (a + 90 < t.length ? '…' : ''); };
+  const open = () => { ov.hidden = false; document.body.classList.add('sopen'); setTimeout(() => $('#sq').focus(), 30); loadNotes(); };
+  const close = () => { ov.hidden = true; document.body.classList.remove('sopen'); };
+  btn.addEventListener('click', open);
+  ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('.sx')) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
+  const go = (hash, nj) => { close(); if (nj) { try { sessionStorage.setItem('nj', JSON.stringify(nj)); } catch (e) {} } if (location.hash === hash) route(); else location.hash = hash; };
+  const grp = (title, items) => items.length ? `<section class="sg"><h5>${title}<i>${items.length}</i></h5>${items.join('')}</section>` : '';
+  const run = () => {
+    const raw = $('#sq').value.trim().toLowerCase(), box = $('#sres'); if (!raw) { box.innerHTML = '<p class="sh">검색어를 입력해 보세요.</p>'; return; }
+    const ts = raw.split(/\s+/).filter(Boolean), all = h => ts.every(q => h.includes(q));
+    const mats = DB.materials.filter(m => all([m.title, m.desc, m.type, m.topic, m.author, (m.tags || []).join(' ')].join(' ').toLowerCase())).slice(0, 20)
+      .map(m => `<a class="sr" data-h="#material-${m.id}"><b>${hi(m.title, ts)}</b><small>${esc([SUBJ[m.subject], m.type].filter(Boolean).join(' · '))}</small></a>`);
+    const bks = DB.books.filter(b => all([b.title, b.subtitle, b.author, b.intro].join(' ').toLowerCase()))
+      .map(b => `<a class="sr" data-h="#books-${b.id}"><b>${hi(b.title, ts)}</b><small>${esc(b.author || '')}</small></a>`);
+    const gy = Object.values(DB.gyegi || {}).filter(g => all([g.title, (g.topics || []).join(' '), (g.sections || []).map(x => x.title + ' ' + (x.items || []).map(i => i.title).join(' ')).join(' ')].join(' ').toLowerCase()))
+      .map(g => `<a class="sr" data-h="#etc-gyegi"><b>${hi(g.title, ts)}</b><small>계기 교육</small></a>`);
+    let nt = [];
+    (notes || []).forEach(({ b, d }) => d.forEach((c, i) => {
+      if (nt.length >= 15) return;
+      const hit = c.blocks.map(x => plain(x).join(' ')).find(t => all(t.toLowerCase())) || (all(c.title.toLowerCase()) ? c.title : null);
+      if (hit) nt.push(`<a class="sr" data-h="#books-${b.id}-notes" data-c="${i}" data-q="${esc(ts[0])}"><b>제${c.n}장 · ${hi(c.title, ts)}</b><small>${hi(snip(hit, ts), ts)}</small></a>`);
+    }));
+    const html = grp('수업·평가 자료', mats) + grp('독서 모임 글', nt) + grp('책', bks) + grp('계기 교육', gy);
+    box.innerHTML = html || `<p class="sh">${notes ? '검색 결과가 없어요.' : '불러오는 중…'}</p>`;
+    if (!notes && !html) loadNotes().then(run);
+  };
+  let tm = 0; $('#sq').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(run, 120); });
+  $('#sres').addEventListener('click', e => { const a = e.target.closest('.sr'); if (!a) return; go(a.dataset.h, a.dataset.c != null ? { c: +a.dataset.c, q: a.dataset.q } : null); });
+}
 async function init(){
   try {
     const [m, b, a, g] = await Promise.all(['materials','books','about','gyegi'].map(n => fetch(`data/${n}.json`).then(r => r.json())));
@@ -538,14 +718,14 @@ async function init(){
     view.innerHTML = '<div class="empty" style="padding:80px 20px">자료를 불러오지 못했어요. 페이지를 새로고침해 주세요.</div>';
     hideLoader(); return;
   }
-  buildNav();
+  buildNav(); initSearch();
   addEventListener('hashchange', route);
   const nv = $('.nav'), sc = () => nv.classList.toggle('scrolled', scrollY > 4); addEventListener('scroll', sc, { passive:true }); sc();
   addEventListener('resize', () => { setNavH(); const t = $('#ttabs'); if (t) moveInd(t); });
   const pad = i => String(i).padStart(2, '0');
-  const imgs = ['images/hero.jpg',
-    ...['about', 'world', 'korea', 'books', 'etc'].map(k => `images/banners/${k}.jpg`),
-    ...['world', 'korea'].flatMap(k => [...[1, 2, 3, 4, 5, 6].map(i => `${k}-${pad(i)}`), `${k}-x`].map(c => `images/units/${c}.png`)),
+  const imgs = ['images/hero.webp',
+    ...['about', 'world', 'korea', 'books', 'etc'].map(k => `images/banners/${k}.webp`),
+    ...['world', 'korea'].flatMap(k => [...[1, 2, 3, 4, 5, 6].map(i => `${k}-${pad(i)}`), `${k}-x`].map(c => `images/units/${c}.webp`)),
     ...DB.materials.map(m => m.thumb).filter(Boolean),
     ...DB.books.map(b => b.cover).filter(Boolean)];
   await Promise.all([preload(imgs, 60000), (document.fonts && document.fonts.ready) || 0]);
