@@ -331,6 +331,8 @@ function renderHome(){
   $('#g-subj').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; hs.subj = b.dataset.k; hs.unit = 'all'; sync(); $$('#g-subj .chip').forEach(c => c.classList.toggle('on', c === b)); homeUnitOptions(); homeList(true); });
   $('#g-type').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; hs.type = b.dataset.k; sync(); $$('#g-type .chip').forEach(c => c.classList.toggle('on', c === b)); homeList(true); });
   $('#unit-sel').addEventListener('change', e => { hs.unit = e.target.value; sync(); homeList(true); });
+  const hero = $('.hero');
+  if (hero) ['pointerdown', 'keydown'].forEach(ev => hero.addEventListener(ev, () => document.body.classList.add('intro-skip'), { once: true }));
 }
 
 /* ---------- 과목 / 단원 ---------- */
@@ -786,7 +788,7 @@ function renderBooks(arg){
       ${b.subtitle ? `<div class="bsub">${esc(b.subtitle)}</div>` : ''}
       <div class="bmeta">${esc(bookSub(b))}</div>
       ${b.intro ? `<div class="bintro">${esc(b.intro)}</div>` : ''}
-      ${b.notes ? `<a class="notebtn" href="#books-${b.id}-notes">모임자료 보기 <span>→</span></a>` : `<div class="notebtn off">모임 자료는 준비 중이에요</div>`}
+      ${b.notes ? `<a class="notebtn" href="#books-${b.id}-notes">모임자료 보기 <span>→</span></a>` : b.matId ? `<a class="notebtn" href="#material-${b.matId}">모임자료 보기 <span>→</span></a>` : `<div class="notebtn off">모임 자료는 준비 중이에요</div>`}
       ${rows.length ? `<section class="sec"><div class="sec-h"><h2>독서 탐구 자료</h2><span>${b.materials.length}개</span></div>
         <div class="list still">${rows.join('')}</div></section>` : ''}
       <div class="pnrow">${pv ? `<a class="pnbtn" href="#books-${pv.id}">← ${esc(pv.title)}</a>` : '<a class="pnbtn" href="#books">← 전체 책</a>'}${nx ? `<a class="pnbtn" href="#books-${nx.id}">${esc(nx.title)} →</a>` : '<span class="pnbtn off">.</span>'}</div>
@@ -796,6 +798,7 @@ function renderBooks(arg){
 
 /* ---------- 라우터 ---------- */
 function route(){
+  document.body.classList.remove('intro-skip');
   const h = (location.hash || '#home').slice(1);
   const [page, arg] = h.split(/-(.+)/);
   if (page !== 'material') listHash = h === 'home' ? 'home' : h;

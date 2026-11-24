@@ -1131,9 +1131,12 @@ body.no-anim .ttl .l2 .pen{display:none}
 .hero h1.ttl .l1 b{opacity:0;animation:ink .8s ease-out calc(.2s + var(--k)*70ms) both}
 .ttl .l2 .wr{display:block}
 .ttl .l2 svg{display:block;height:1em;width:auto;overflow:visible}
-.ttl .l2 .g{fill:#b8760f;fill-opacity:0;stroke:#b8760f;stroke-width:14;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:gdraw .75s ease-in-out calc(1.5s + var(--k)*.2s) forwards,gfill .4s ease-out calc(1.5s + var(--k)*.2s + .55s) forwards}
+.ttl .l2 .g{paint-order:stroke fill;fill:#b8760f;fill-opacity:0;stroke:#b8760f;stroke-width:40;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:gdraw .75s ease-in-out calc(1.5s + var(--k)*.2s) forwards,gfill .4s ease-out calc(1.5s + var(--k)*.2s + .55s) forwards}
 @keyframes gdraw{to{stroke-dashoffset:0}}
-@keyframes gfill{to{fill-opacity:1;stroke-width:4}}
+@keyframes gfill{to{fill-opacity:1;stroke:#fff;stroke-width:45}}
 .sw{animation:calm .6s var(--ease) 2.6s both}
 .hq a:nth-child(1){animation-delay:2.8s}.hq a:nth-child(2){animation-delay:2.9s}.hq a:nth-child(3){animation-delay:3s}
 .more-hint{animation:calm .6s var(--ease) 3.2s both}
+
+/* 홈 인트로: 화면을 누르면 애니메이션을 바로 끝냄 */
+body.intro-skip .hero h1.ttl .l1,body.intro-skip .hero h1.ttl .l1 b,body.intro-skip .ttl .l2 .g,body.intro-skip .sw,body.intro-skip .hq a,body.intro-skip .more-hint{animation-delay:0s!important;animation-duration:.01s!important}
