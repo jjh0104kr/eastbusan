@@ -70,6 +70,8 @@ function renderMaterial(m){
     (m.learn || []).length ? card('다루는 내용', `<ul>${m.learn.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : '',
     (m.play || []).length ? card('플레이 정보', dl(m.play)) : '',
     card('자료 정보', dl([['과목', subjOf(m)], ['단원', m.subject === 'etc' ? '' : `${unitLabel(m.unit)}${un ? ' · ' + esc(un) : ''}`], ['다룬 내용', esc(m.topic || '')], ['유형', esc(m.type)], ['형식', esc(m.format || '')], ['만든 사람', esc(m.author || '')], ['등록일', fmt(esc(m.date))]])),
+    (m.related || []).length ? card(esc(m.relatedTitle || '관련 자료'), `<div class="rel">${m.related.map(id => DB.materials.find(x => x.id === id)).filter(Boolean).map(r => `<a href="#material-${r.id}"><span><em>${esc(subjOf(r))} · ${esc(r.type)}</em><b>${esc(r.title)}</b></span><i>자료 살펴보기 →</i></a>`).join('')}</div>`, 'wide') : '',
+    m.bgm ? card('추천 BGM', `<div class="bgm"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.bgm)}" title="${esc(m.title)} 추천 BGM" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><p class="bgm-l"><a href="https://youtu.be/${esc(m.bgm)}" target="_blank" rel="noopener">유튜브에서 열기 ↗</a></p>`, 'wide') : '',
     (m.tags || []).length ? card('키워드', `<div class="tags big">${m.tags.map(t => `<i>#${esc(t)}</i>`).join('')}</div>`, 'wide') : ''
   ].join('');
   view.innerHTML = `
@@ -221,8 +223,10 @@ function homeList(animate){
   const fw = active && hs.type === 'all' && hs.unit === 'all' ? wsFind(t => norm(t).includes(q), hs.subj) : { ws: [], cmp: [] };
   const wsn = fw.ws.length + fw.cmp.length;
   $('#res-count').textContent = `${items.length + wsn}개`;
-  $('#home-ws').innerHTML = wsn ? (fw.cmp.length ? `<h3>단원별 비교<i>${fw.cmp.length}</i></h3><div class="hws-g">${fw.cmp.slice(0, 12).map(({ e, href }) => `<a class="hws-r" href="${href}"><b>${esc(e.u.t)}</b><small>${e.tn}명의 학습지를 나란히 보기</small></a>`).join('')}</div>` : '')
-    + (fw.ws.length ? `<h3>학습지<i>${fw.ws.length}</i></h3><div class="hws-g">${fw.ws.slice(0, 18).map(({ w, c, href, p, sn }) => `<a class="hws-r" href="${href}" data-w="${w.id}" data-p="${p}"><b>${esc(c.n)} · ${esc(c.title)}</b><small>${esc(w.teacher)} · ${esc(w.term)} · ${p}쪽</small>${sn ? `<em>${esc(sn)}</em>` : ''}</a>`).join('')}</div>` : '') : '';
+  $('#home-ws').innerHTML = wsn ? (fw.cmp.length ? `<h3>단원별 비교<i>${fw.cmp.length}</i></h3><div class="hws-g">${fw.cmp.slice(0, 12).map(({ e, href }, i) => `<a class="hws-r${i >= 3 ? ' xtra' : ''}" href="${href}"><b>${esc(e.u.t)}</b><small>${e.tn}명의 학습지를 나란히 보기</small></a>`).join('')}</div>` : '')
+    + (fw.ws.length ? `<h3>교과 수업 학습지<i>${fw.ws.length}</i></h3><div class="hws-g">${fw.ws.slice(0, 18).map(({ w, c, href, p, sn }, i) => `<a class="hws-r${i >= 3 ? ' xtra' : ''}" href="${href}" data-w="${w.id}" data-p="${p}"><b>${esc(c.n)} · ${esc(c.title)}</b><small>${esc(w.teacher)} · ${esc(w.term)} · ${p}쪽</small>${sn ? `<em>${esc(sn)}</em>` : ''}</a>`).join('')}</div>` : '') : '';
+  { const hw = $('#home-ws'); $$('.hws-g', hw).forEach(g => { const n = $$('.xtra', g).length; if (n) { g.classList.add('fold'); g.previousElementSibling.insertAdjacentHTML('beforeend', `<button type="button" class="more-b" data-n="${n}">더보기 (+${n})</button>`); } });
+    hw.onclick = e => { const b = e.target.closest('.more-b'); if (!b) return; const g = b.parentNode.nextElementSibling; const open = g.classList.toggle('fold') === false; b.textContent = open ? '접기' : `더보기 (+${b.dataset.n})`; }; }
   const mh = $('#home-mh'); mh.hidden = !items.length; mh.innerHTML = `수업·평가 자료<i>${items.length}</i>`;
   const list = $('#home-list');
   list.classList.toggle('still', !animate);
@@ -276,7 +280,7 @@ const ARCHIVE_SVG = '<svg viewBox="-30 -870 3130 966" aria-hidden="true"><g tran
 function renderHome(){
   const picks = DB.materials.filter(m => m.pick).sort((x, y) => x.pick - y.pick);
   const latest = (picks.length ? picks : [...DB.materials].sort(byNew)).slice(0, 3);
-  const cols = latest.length ? `<div class="pgrid home-pg rv">${latest.map((m, i) => posterHTML(m, i)).join('')}</div>` : '<p class="bempty">아직 올라온 자료가 없어요.</p>';
+  const cols = latest.length ? `<div class="rec rv" id="rec"><div class="rec-vp">${latest.map((m, i) => `<article class="rec-s${i ? '' : ' on'}" data-i="${i}"><a class="rec-img" href="#material-${m.id}">${posterImg(m)}</a><div class="rec-tx">${pills(m)}<h3><a href="#material-${m.id}">${esc(m.title)}</a></h3><p class="rec-meta">${esc([subjOf(m), m.subject === 'etc' ? (m.group || '') : unitLabel(m.unit), m.author].filter(Boolean).join(' · '))}</p><p class="rec-d">${esc(m.desc || '')}</p><a class="notebtn" href="#material-${m.id}">자료 보기 <span>→</span></a></div></article>`).join('')}</div>${latest.length > 1 ? `<div class="rec-nav"><button type="button" class="rec-b" data-d="-1" aria-label="이전 추천">‹</button><div class="rec-dots">${latest.map((m, i) => `<button type="button" class="${i ? '' : 'on'}" data-i="${i}" aria-label="${i + 1}번째 추천"></button>`).join('')}</div><button type="button" class="rec-b" data-d="1" aria-label="다음 추천">›</button></div>` : ''}</div>` : '<p class="bempty">아직 올라온 자료가 없어요.</p>';
   view.innerHTML = `
   <section class="hero" id="hero">
     <button class="fx-btn" id="fxbtn" type="button" aria-pressed="false"></button>
@@ -293,7 +297,7 @@ function renderHome(){
       <div class="sw">
         <label class="search" id="sbox">
           <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input id="q" type="search" placeholder="자료 제목, 설명, 선생님 이름으로 검색" autocomplete="off" value="${esc(hs.q)}" aria-label="자료 검색">
+          <input id="q" type="search" placeholder="제목, 설명, 선생님 이름" autocomplete="off" value="${esc(hs.q)}" aria-label="자료 검색">
           <button class="clr" id="clr" type="button" aria-label="검색어 지우기" hidden>×</button>
           <button class="fbtn" id="fbtn" type="button" aria-expanded="false">필터<i></i></button>
         </label>
@@ -320,6 +324,11 @@ function renderHome(){
     hh(); addEventListener('orientationchange', () => setTimeout(hh, 300)); if (innerWidth > 1100) addEventListener('resize', hh); }
   const fxb = $('#fxbtn'), fxs = () => { const off = document.body.classList.contains('no-anim'); fxb.setAttribute('aria-pressed', off); fxb.innerHTML = off ? '<i></i>효과 켜기' : '<i></i>효과 끄기'; };
   fxs(); fxb.addEventListener('click', () => { const off = document.body.classList.toggle('no-anim'); try { localStorage.setItem('noanim', off ? '1' : ''); } catch (e) {} fxs(); });
+  { const rec = $('#rec'); if (rec) { const sl = $$('.rec-s', rec), dots = $$('.rec-dots button', rec); let cur = 0, tm = null;
+    const go = n => { cur = (n + sl.length) % sl.length; sl.forEach((x, k) => x.classList.toggle('on', k === cur)); dots.forEach((x, k) => x.classList.toggle('on', k === cur)); };
+    const play = () => { clearInterval(tm); if (sl.length > 1) tm = setInterval(() => { if (!document.body.contains(rec)) { clearInterval(tm); return; } go(cur + 1); }, 5000); };
+    rec.addEventListener('click', e => { const b = e.target.closest('.rec-b'), d = e.target.closest('.rec-dots button'); if (b) go(cur + +b.dataset.d); else if (d) go(+d.dataset.i); else return; play(); });
+    rec.addEventListener('mouseenter', () => clearInterval(tm)); rec.addEventListener('mouseleave', play); play(); } }
   $('#hint').addEventListener('click', () => $('#board-sec').scrollIntoView({ behavior:'smooth', block:'start' }));
   const qi = $('#q'), clr = $('#clr'), fb = $('#fbtn'), fp = $('#fpanel');
   const sync = () => { clr.hidden = !qi.value; fb.classList.toggle('dot', hs.subj !== 'all' || hs.type !== 'all' || hs.unit !== 'all'); };
@@ -537,18 +546,36 @@ function renderAbout(){
   const qs = arr => `<div class="ab-q"><h4>함께 고민할 질문</h4><ul>${arr.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>`;
   const sec = (id, n, t, body) => `<section id="${id}" class="ab-s"><div class="ab-l"><b>${n}</b><h2>${esc(t)}</h2></div><div class="ab-r">${body}</div></section>`;
   const half = (S) => `<div class="ab-tag">${esc(S.tag)}</div><h3 class="ab-head">${esc(S.head)}</h3>${para(S.text)}${S.text2 ? para(S.text2) : ''}<h4 class="ab-sub">${esc(S.itemsTitle)}</h4>${rows(S.items)}${qs(S.qs)}`;
-  const NAV = [['ab1', '활동 방향'], ['ab2', '상반기'], ['ab3', '하반기'], ['ab4', '2027년'], ['ab5', '연간 흐름'], ['ab6', '지향하는 수업']];
+  const NAV = [['ab1', '활동 방향'], ['ab2', '2026년'], ['ab4', '2027년'], ['ab5', '모임 로드맵'], ['ab6', '지향점']];
   view.innerHTML = band({ cls:'s-about', crumb:'<a href="#home">홈</a> › 모임 소개', title:'모임 소개', desc:'', img: bandImg('images/sections/about.webp') }) + `
   <div class="wrap s-about ab">
-    <header class="ab-top"><span class="ab-eyebrow">동부산 역사교사모임</span><h2>${esc(A.lead)}</h2>${A.intro.map(para).join('')}
-      <nav class="ab-nav" id="ab-nav">${NAV.map(([id, t]) => `<a href="#" data-t="${id}">${t}</a>`).join('')}</nav></header>
+    <header class="ab-top"><div class="ab-intro">${A.intro.map((t, i) => i ? para(t) : (l => `<div class="ab-lbox"><p class="ab-lead">${mk(l[0])}</p><p>${l.slice(1).map(mk).join('<br>')}</p></div>`)(t.split('\n'))).join('')}</div>
+      <nav class="ab-nav" id="ab-nav">${NAV.map(([id, t]) => `<a href="#" data-t="${id}">${t}</a>`).join('')}</nav>
+      <div class="ab-res"><h3><span>${esc(A.results.title)}</span></h3><div class="ab-rg">${A.results.items.map(it => { const b = DB.books.find(x => x.id === it.bookId); if (!b) return ''; const h = b.notes ? `#books-${b.id}-notes` : b.matId ? `#material-${b.matId}` : `#books-${b.id}`; return `<div class="ab-rc"><span class="ab-rh">${esc(it.half)}</span>${coverHTML(b)}<strong>${esc(b.title)}</strong><a class="notebtn" href="${h}">결과물 보기 <span>→</span></a></div>`; }).join('')}</div></div></header>
+    <div class="ab-body"><aside class="ab-side"><p class="ab-st">목차</p><nav id="ab-side">${NAV.map(([id, t]) => `<a href="#" data-t="${id}">${t}</a>`).join('')}</nav></aside><div class="ab-main">
     ${sec('ab1', '1', A.s1.title, `<div class="ab-key"><span>${esc(A.s1.key)}</span><p>${mk(A.s1.keyText)}</p></div>${rows(A.s1.items)}`)}
     ${sec('ab2', '2', A.s2.title, half(A.s2))}
     ${sec('ab3', '3', A.s3.title, half(A.s3))}
     ${sec('ab4', '4', A.s4.title, `<div class="ab-tag">${esc(A.s4.tag)}</div><h3 class="ab-head">${esc(A.s4.head)}</h3>${para(A.s4.text)}${para(A.s4.text2)}<h4 class="ab-sub">${esc(A.s4.booksTitle)}</h4>${rows(A.s4.books.map(([t, d]) => ['『' + t + '』', d]))}${para(A.s4.after)}`)}
     ${sec('ab5', '5', A.s5.title, `<p class="ab-subt">${esc(A.s5.sub)}</p><ol class="ab-tl">${A.s5.steps.map(([w, t, d]) => `<li><span>${esc(w)}</span><strong>${esc(t)}</strong><p>${esc(d)}</p></li>`).join('')}</ol>`)}
     ${sec('ab6', '6', A.s6.title, `${para(A.s6.text)}<blockquote>${mk(A.s6.quote)}</blockquote>${para(A.s6.after)}`)}
+    </div></div>
   </div>`;
+  const side = $('#ab-side'), tabs = $$('a', side);
+  const off = () => (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) + 40;
+  const alias = { ab3: 'ab2' };
+  const spy = () => {
+    if (!document.getElementById('ab-side')) { window.removeEventListener('scroll', spy); return; }
+    let cur = NAV[0][0];
+    ['ab1', 'ab2', 'ab3', 'ab4', 'ab5', 'ab6'].forEach(id => { const el = $('#' + id); if (el && el.getBoundingClientRect().top <= off() + 10) cur = alias[id] || id; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = NAV[NAV.length - 1][0];
+    tabs.forEach(t => t.classList.toggle('on', t.dataset.t === cur));
+  };
+  window.addEventListener('scroll', spy, { passive: true }); spy();
+  side.addEventListener('click', e => {
+    const a = e.target.closest('a'); if (!a) return; e.preventDefault();
+    const t = $('#' + a.dataset.t); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) - 20, behavior: 'smooth' });
+  });
   $('#ab-nav').addEventListener('click', e => {
     const a = e.target.closest('a'); if (!a) return; e.preventDefault();
     const t = $('#' + a.dataset.t); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nh')) || 64) - 20, behavior: 'smooth' });
@@ -853,7 +880,7 @@ function initSearch(){
   ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('.sx')) close(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
   const go = (hash, nj) => { close(); if (nj) { try { sessionStorage.setItem('nj', JSON.stringify(nj)); } catch (e) {} } if (location.hash === hash) route(); else location.hash = hash; };
-  const grp = (title, items) => items.length ? `<section class="sg"><h5>${title}<i>${items.length}</i></h5>${items.join('')}</section>` : '';
+  const grp = (title, items, fold) => !items.length ? '' : fold && items.length > 3 ? `<section class="sg"><h5>${title}<i>${items.length}</i><button type="button" class="more-b" data-n="${items.length - 3}">더보기 (+${items.length - 3})</button></h5>${items.slice(0, 3).join('')}<div class="xw" hidden>${items.slice(3).join('')}</div></section>` : `<section class="sg"><h5>${title}<i>${items.length}</i></h5>${items.join('')}</section>`;
   const run = () => {
     const raw = $('#sq').value.trim().toLowerCase(), box = $('#sres'); if (!raw) { box.innerHTML = '<p class="sh">검색어를 입력해 보세요.</p>'; return; }
     const ts = raw.split(/\s+/).filter(Boolean), all = h => ts.every(q => h.includes(q));
@@ -872,12 +899,12 @@ function initSearch(){
     const fw = wsFind(h => all(h.toLowerCase())),
       wsr = fw.ws.slice(0, 20).map(({ w, c, href, p, sn }) => `<a class="sr" data-h="${href}" data-w="${w.id}" data-p="${p}"><b>${hi(c.n + ' · ' + c.title, ts)}</b><small>${esc(w.teacher)} · ${esc(w.term)} · ${p}쪽${sn ? ' — ' + hi(sn, ts) : ''}</small></a>`),
       cmr = fw.cmp.slice(0, 12).map(({ e, href }) => `<a class="sr" data-h="${href}"><b>${hi(e.u.t, ts)}</b><small>단원별 비교 · ${e.tn}명의 학습지</small></a>`);
-    const html = grp('단원별 비교', cmr) + grp('학습지', wsr) + grp('수업·평가 자료', mats) + grp('독서 모임 글', nt) + grp('책', bks) + grp('계기 교육', gy);
+    const html = grp('단원별 비교', cmr, 1) + grp('교과 수업 학습지', wsr, 1) + grp('수업·평가 자료', mats) + grp('독서 모임 글', nt) + grp('책', bks) + grp('계기 교육', gy);
     box.innerHTML = html || `<p class="sh">${notes ? '검색 결과가 없어요.' : '불러오는 중…'}</p>`;
     if (!notes && !html) loadNotes().then(run);
   };
   let tm = 0; $('#sq').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(run, 120); });
-  $('#sres').addEventListener('click', e => { const a = e.target.closest('.sr'); if (!a) return; if (a.dataset.w) { try { sessionStorage.setItem('wj', JSON.stringify({ id: a.dataset.w, p: +a.dataset.p })); } catch (e) {} } go(a.dataset.h, a.dataset.c != null ? { c: +a.dataset.c, q: a.dataset.q } : null); });
+  $('#sres').addEventListener('click', e => { const mb = e.target.closest('.more-b'); if (mb) { const x = mb.closest('section').querySelector('.xw'); x.hidden = !x.hidden; mb.textContent = x.hidden ? `더보기 (+${mb.dataset.n})` : '접기'; return; } const a = e.target.closest('.sr'); if (!a) return; if (a.dataset.w) { try { sessionStorage.setItem('wj', JSON.stringify({ id: a.dataset.w, p: +a.dataset.p })); } catch (e) {} } go(a.dataset.h, a.dataset.c != null ? { c: +a.dataset.c, q: a.dataset.q } : null); });
 }
 async function init(){
   try {
