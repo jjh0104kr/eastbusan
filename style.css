@@ -1304,3 +1304,19 @@ body.intro-skip .hero h1.ttl .l1,body.intro-skip .hero h1.ttl .l1 b,body.intro-s
 .tc code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:17px;font-weight:700;background:var(--ink);color:#fff;padding:5px 14px;border-radius:8px;letter-spacing:.02em}
 .tc span{font-size:15px}
 .tc li::before{display:none!important}
+.tc span small{display:block;margin-top:3px;font-size:13px;color:#7a5410}
+
+/* 자료 상세 카드 정리 */
+.mcards{display:flex!important;flex-direction:column;gap:18px;margin-top:22px}
+.mrow2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.mstack{display:flex;flex-direction:column;gap:18px}
+.mc{padding:22px 26px}
+.mc h3{margin:0 0 12px}
+.mc dl div{padding:9px 0}
+.mc ul{gap:6px}.mc ol{gap:10px}
+.mc p{margin:0;line-height:1.75}
+.bgm{margin-left:0}
+@media(max-width:780px){.mrow2{grid-template-columns:1fr}}
+
+.info2 dl{grid-template-columns:1fr 1fr;column-gap:40px}
+@media(max-width:780px){.info2 dl{grid-template-columns:1fr}}

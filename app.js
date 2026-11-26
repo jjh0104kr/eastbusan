@@ -65,17 +65,21 @@ function renderMaterial(m){
   const same = DB.materials.filter(x => x.subject === m.subject && x.unit === m.unit).sort(byNew), i = same.indexOf(m), pv = same[i - 1], nx = same[i + 1];
   const dl = rows => `<dl>${rows.filter(r => r[1]).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
   const card = (t, body, cls = '') => `<section class="mc ${cls}"><h3>${t}</h3>${body}</section>`;
-  const cards = [
+  const parts = [
     (m.how || []).length ? card('진행 방식', `<ol>${m.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`, 'wide') : '',
     (m.learn || []).length ? card('다루는 내용', `<ul>${m.learn.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`) : '',
     (m.play || []).length ? card('플레이 정보', dl(m.play)) : '',
-    (m.teacher || []).length ? card('교사 전용 코드', `<ul class="tc">${m.teacher.map(([c, d]) => `<li><code>${esc(c)}</code><span>${esc(d)}</span></li>`).join('')}</ul>`, 'wide tcard') : '',
+    (m.teacher || []).length ? card('교사 전용 코드', `<ul class="tc">${m.teacher.map(([c, d, u]) => `<li><code>${esc(c)}</code><span>${esc(d)}${u ? `<small>사용 상황 · ${esc(u)}</small>` : ''}</span></li>`).join('')}</ul>`, 'wide tcard') : '',
     m.wrap ? card('마무리 활동', `<p>${esc(m.wrap).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')}</p>`, 'wide') : '',
     card('자료 정보', dl([['과목', subjOf(m)], ['단원', m.subject === 'etc' ? '' : `${unitLabel(m.unit)}${un ? ' · ' + esc(un) : ''}`], ['다룬 내용', esc(m.topic || '')], ['유형', esc(m.type)], ['형식', esc(m.format || '')], ['만든 사람', esc(m.author || '')], ['등록일', fmt(esc(m.date))]])),
     (m.related || []).length ? card(esc(m.relatedTitle || '관련 자료'), `<div class="rel">${m.related.map(id => DB.materials.find(x => x.id === id)).filter(Boolean).map(r => `<a href="#material-${r.id}"><span><em>${esc(subjOf(r))} · ${esc(r.type)}</em><b>${esc(r.title)}</b></span><i>자료 살펴보기 →</i></a>`).join('')}</div>`, 'wide') : '',
     m.bgm ? card('추천 BGM', `<div class="bgm"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.bgm)}" title="${esc(m.title)} 추천 BGM" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><p class="bgm-l"><a href="https://youtu.be/${esc(m.bgm)}" target="_blank" rel="noopener">유튜브에서 열기 ↗</a></p>`, 'wide') : '',
-    (m.tags || []).length ? card('키워드', `<div class="tags big">${m.tags.map(t => `<i>#${esc(t)}</i>`).join('')}</div>`, 'wide') : ''
-  ].join('');
+    (m.tags || []).length ? card('키워드', `<div class="tags big">${m.tags.map(t => `<i>#${esc(t)}</i>`).join('')}</div>`) : ''
+  ];
+  const [cHow, cLearn, cPlay, cTea, cWrap, cInfo, cRel, cBgm, cTags] = parts;
+  const pair = (a, b) => a && b ? `<div class="mrow2">${a}${b}</div>` : (a || b);
+  const stack = [cBgm, cTags].filter(Boolean).join('');
+  const cards = cTea + cHow + pair(cLearn, cPlay) + cWrap + cRel + (cBgm ? pair(cInfo, `<div class="mstack">${stack}</div>`) : cInfo.replace('class="mc "', 'class="mc info2"') + cTags);
   view.innerHTML = `
   <div class="wrap s-${m.subject}"><div class="mdetail">
     <div class="m-poster">${posterImg(m)}${m.author ? `<em class="by">${esc(m.author)}</em>` : ''}</div>
